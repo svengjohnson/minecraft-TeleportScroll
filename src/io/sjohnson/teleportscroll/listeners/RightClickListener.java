@@ -50,7 +50,7 @@ public class RightClickListener implements Listener {
                 this.teleportPlayer(player, nbtItem, stack);
             }
             else {
-                this.storeLocation(player, nbtItem, stack);
+                this.storeLocation(player, stack);
             }
         }
     }
@@ -134,9 +134,8 @@ public class RightClickListener implements Listener {
         return currentWorld.equals(world) && currentX == x && currentY == y && currentZ == z;
     }
 
-    private void storeLocation(Player player, NBTItem nbtItem, ItemStack stack)
+    private void storeLocation(Player player, ItemStack stack)
     {
-        int tier = nbtItem.getInteger("tier");
         if (player.getInventory().firstEmpty() == -1) {
             player.sendMessage(ChatColor.RED + "Need at least 1 free inventory space");
             return;
@@ -150,35 +149,11 @@ public class RightClickListener implements Listener {
         int y = ((int) location.getY());
         int z = ((int) location.getZ());
 
-        String name;
-        String lore;
-
         ItemStack teleportScroll;
 
-        switch (tier) {
-            case 2:
-                name = ChatColor.YELLOW + "Enhanced Teleport Scroll";
-                lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", w, x, y, z,name);
-                teleportScroll = CreateItem.enhancedTeleportScroll(name, lore);
-                break;
-            case 3:
-                name = ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Teleport Scroll";
-                lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", w, x, y, z,name);
-                teleportScroll = CreateItem.eternalTeleportScroll(name, lore);
-                break;
-            default:
-                name = ChatColor.AQUA + "Teleport Scroll";
-                lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", w, x, y, z,name);
-                teleportScroll = CreateItem.teleportScroll(name, lore);
-        }
+        teleportScroll = CreateItem.createTeleportScrollWithCoords(stack, w, x, y, z);
 
-        NBTItem NBTItem = new NBTItem(teleportScroll);
-        NBTItem.setString("world", w);
-        NBTItem.setInteger("x", x);
-        NBTItem.setInteger("y", y);
-        NBTItem.setInteger("z", z);
-
-        player.getInventory().addItem(NBTItem.getItem());
+        player.getInventory().addItem(teleportScroll);
         stack.setAmount(stack.getAmount() - 1);
     }
 

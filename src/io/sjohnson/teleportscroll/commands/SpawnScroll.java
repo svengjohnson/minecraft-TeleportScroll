@@ -24,29 +24,8 @@ public class SpawnScroll implements CommandExecutor {
             int quantity = Math.min(Integer.parseInt(args[1]), 64);
 
             ItemStack item;
-            String name;
-            String displayName;
-            String lore;
 
-            switch (tier) {
-                case 3:
-                    name = "Blank Eternal Teleport Scroll";
-                    displayName = ChatColor.YELLOW + name;
-                    lore = ChatColor.DARK_GREEN + name;
-                    item = CreateItem.eternalTeleportScroll(displayName, lore);
-                    break;
-                case 2:
-                    name = "Blank Enhanced Teleport Scroll";
-                    displayName = ChatColor.YELLOW + name;
-                    lore = ChatColor.DARK_GREEN + name;
-                    item = CreateItem.enhancedTeleportScroll(displayName, lore);
-                    break;
-                default:
-                    name = "Blank Teleport Scroll";
-                    displayName = ChatColor.WHITE + name;
-                    lore = ChatColor.DARK_GREEN + name;
-                    item = CreateItem.teleportScroll(displayName, lore);
-            }
+            item = CreateItem.createTeleportScroll(tier);
 
             item.setAmount(quantity);
             player.getInventory().addItem(item);

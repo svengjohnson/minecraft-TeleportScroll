@@ -1,6 +1,7 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -10,53 +11,39 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@SuppressWarnings("DuplicatedCode")
 public class CreateItem {
-    public static ItemStack teleportScroll(String name, String lore)
-    {
-        ItemStack item = new ItemStack(Material.PAPER);
-        ItemMeta Meta = item.getItemMeta();
-        assert Meta != null;
-        Meta.setDisplayName(name);
-        Meta.setLore(CreateItem.formatLore(lore));
-
-        Meta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
-        );
-
-        item.setItemMeta(Meta);
-        item.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1);
-
-        NBTItem nbtItem = new NBTItem(item);
-        nbtItem.setBoolean("is_teleport_scroll", true);
-        nbtItem.setInteger("tier", 1);
-
-        return nbtItem.getItem();
-    }
-
-    public static ItemStack createTeleportScroll(int tier, String name, String lore)
+    public static ItemStack createTeleportScroll(int tier)
     {
         Material material;
 
-        switch (tier)
-        {
-            case 3:
+        String name;
+        String displayName;
+        String lore;
+
+        switch (tier) {
+            case 3 -> {
                 material = Material.FLOWER_BANNER_PATTERN;
-                break;
-            default:
+                name = "Blank Eternal Teleport Scroll";
+                displayName = ChatColor.YELLOW + name;
+            }
+            case 2 -> {
                 material = Material.PAPER;
-                break;
+                name = "Blank Enhanced Teleport Scroll";
+                displayName = ChatColor.YELLOW + name;
+            }
+            default -> {
+                material = Material.PAPER;
+                name = "Blank Teleport Scroll";
+                displayName = ChatColor.WHITE + name;
+            }
         }
+
+        lore = ChatColor.DARK_GREEN + name;
 
         ItemStack item = new ItemStack(material);
         ItemMeta Meta = item.getItemMeta();
         assert Meta != null;
-        Meta.setDisplayName(name);
+        Meta.setDisplayName(displayName);
         Meta.setLore(CreateItem.formatLore(lore));
 
         Meta.addItemFlags(
@@ -77,67 +64,40 @@ public class CreateItem {
         return nbtItem.getItem();
     }
 
-    public static ItemStack enhancedTeleportScroll(String name, String lore)
+    public static ItemStack createTeleportScrollWithCoords(ItemStack item, String world, int x, int y, int z)
     {
-        ItemStack item = new ItemStack(Material.PAPER);
-        ItemMeta Meta = item.getItemMeta();
-        assert Meta != null;
-        Meta.setDisplayName(name);
-        Meta.setLore(CreateItem.formatLore(lore));
 
-        Meta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
-        );
+        NBTItem nbtItem = new NBTItem(item.clone());
 
-        item.setItemMeta(Meta);
-        item.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1);
+        int tier = nbtItem.getInteger("tier");
+        String name = switch (tier) {
+            case 2 -> ChatColor.YELLOW + "Enhanced Teleport Scroll";
+            case 3 -> ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Teleport Scroll";
+            default -> ChatColor.AQUA + "Teleport Scroll";
+        };
 
-        NBTItem nbtItem = new NBTItem(item);
-        nbtItem.setBoolean("is_teleport_scroll", true);
-        nbtItem.setInteger("tier", 2);
+        String lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", world, x, y, z, name);
+        nbtItem.setString("world", world);
+        nbtItem.setInteger("x", x);
+        nbtItem.setInteger("y", y);
+        nbtItem.setInteger("z", z);
 
-        return nbtItem.getItem();
-    }
+        ItemStack outputItem = nbtItem.getItem();
+        ItemMeta meta = outputItem.getItemMeta();
 
-    public static ItemStack eternalTeleportScroll(String name, String lore)
-    {
-        ItemStack item = new ItemStack(Material.GLOBE_BANNER_PATTERN);
-        ItemMeta Meta = item.getItemMeta();
-        assert Meta != null;
-        Meta.setDisplayName(name);
-        Meta.setLore(CreateItem.formatLore(lore));
+        assert meta != null;
+        meta.setDisplayName(name);
+        meta.setLore(CreateItem.formatLore(lore));
 
-        Meta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
-        );
+        outputItem.setItemMeta(meta);
 
-        item.setItemMeta(Meta);
-        item.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1);
-
-        NBTItem nbtItem = new NBTItem(item);
-        nbtItem.setBoolean("is_teleport_scroll", true);
-        nbtItem.setInteger("tier", 3);
-
-        return nbtItem.getItem();
+        return outputItem;
     }
 
     private static ArrayList<String> formatLore(String lore)
     {
         String[] loreText = lore.split(";");
-        ArrayList<String> Lore = new ArrayList<>();
 
-        Lore.addAll(Arrays.asList(loreText));
-
-        return Lore;
+        return new ArrayList<>(Arrays.asList(loreText));
     }
 }

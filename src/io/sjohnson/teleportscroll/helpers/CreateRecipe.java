@@ -1,8 +1,6 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import io.sjohnson.teleportscroll.Main;
-import io.sjohnson.teleportscroll.helpers.CreateItem;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
@@ -10,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 
-@SuppressWarnings("DuplicatedCode")
 public class CreateRecipe {
 
     Server server;
@@ -30,11 +27,8 @@ public class CreateRecipe {
 
     public ShapedRecipe teleportScroll() {
         NamespacedKey key = new NamespacedKey(plugin, "teleport_scroll");
-        String name = "Blank Teleport Scroll";
-        String displayName = ChatColor.WHITE + name;
-        String lore = ChatColor.DARK_GREEN + name;
 
-        ItemStack teleportScroll = CreateItem.teleportScroll(displayName, lore);
+        ItemStack teleportScroll = CreateItem.createTeleportScroll(1);
         teleportScroll.setAmount(8);
 
         ShapedRecipe Recipe = new ShapedRecipe(key, teleportScroll);
@@ -51,11 +45,8 @@ public class CreateRecipe {
 
     public ShapedRecipe enhancedTeleportScroll() {
         NamespacedKey key = new NamespacedKey(plugin, "enhanced_teleport_scroll");
-        String name = "Blank Enhanced Teleport Scroll";
-        String displayName = ChatColor.YELLOW + name;
-        String lore = ChatColor.DARK_GREEN + name;
 
-        ItemStack enhancedTeleportScroll = CreateItem.enhancedTeleportScroll(displayName, lore);
+        ItemStack enhancedTeleportScroll = CreateItem.createTeleportScroll(2);
         enhancedTeleportScroll.setAmount(8);
 
         ShapedRecipe Recipe = new ShapedRecipe(key, enhancedTeleportScroll);
@@ -73,11 +64,7 @@ public class CreateRecipe {
 
     public ShapedRecipe eternalTeleportScroll() {
         NamespacedKey key = new NamespacedKey(plugin, "eternal_teleport_scroll");
-        String name = "Blank Eternal Teleport Scroll";
-        String displayName = ChatColor.YELLOW + name;
-        String lore = ChatColor.DARK_GREEN + name;
-
-        ItemStack eternalTeleportScroll = CreateItem.eternalTeleportScroll(displayName, lore);
+        ItemStack eternalTeleportScroll = CreateItem.createTeleportScroll(3);
 
         ShapedRecipe Recipe = new ShapedRecipe(key, eternalTeleportScroll);
         Recipe.shape(

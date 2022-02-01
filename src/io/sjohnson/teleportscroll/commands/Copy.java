@@ -1,6 +1,7 @@
 package io.sjohnson.teleportscroll.commands;
 
 import de.tr7zw.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -23,7 +24,7 @@ public class Copy implements CommandExecutor {
             {
                 NBTItem nbtItem = new NBTItem(itemStack);
 
-                if (!nbtItem.hasKey("is_teleport_scroll")) {
+                if (!ItemHelper.isTeleportScroll(itemStack)) {
                     player.sendMessage(ChatColor.RED + "This command can only be used on teleport scrolls");
                     return true;
                 }
@@ -44,9 +45,9 @@ public class Copy implements CommandExecutor {
 
                 return true;
             }
-
         }
-        
+
+
         return true;
     }
 
@@ -123,7 +124,7 @@ public class Copy implements CommandExecutor {
 
             if (
                     item.getType() == Material.PAPER &&
-                            !item.containsEnchantment(Enchantment.PROTECTION_EXPLOSIONS) &&
+                            !ItemHelper.isTeleportScroll(item) &&
                             item.getAmount() >= required
             ) {
                 return item;

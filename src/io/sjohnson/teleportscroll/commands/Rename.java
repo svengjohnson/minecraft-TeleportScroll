@@ -18,6 +18,10 @@ public class Rename implements CommandExecutor {
             StringBuilder joinedArgs = new StringBuilder();
             String message;
 
+            if (args.length < 1) {
+                return true;
+            }
+
             for (String arg : args)
             {
                 joinedArgs.append(" ").append(arg);
