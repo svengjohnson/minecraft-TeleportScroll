@@ -1,61 +1,31 @@
-package io.sjohnson.teleportscroll.listeners;
+package io.sjohnson.teleportscroll.handlers;
 
 import de.tr7zw.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.CreateItem;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class RightClickListener implements Listener {
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) throws InterruptedException {
-        Player player = event.getPlayer();
-        Action action = event.getAction();
+public class ActivateTeleportScrollHandler {
+    public ActivateTeleportScrollHandler(Player player, ItemStack item) throws InterruptedException {
+        NBTItem nbtItem = new NBTItem(item);
 
-        // The action has to be a right click
-        if (!(action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+        if (!player.isSneaking()) {
+            player.sendMessage(ChatColor.YELLOW + "You must be crouching to use teleport scrolls");
             return;
         }
 
-        // don't run for off-hand
-        if (Objects.equals(event.getHand(), EquipmentSlot.OFF_HAND)) {
-            return;
+        if (nbtItem.hasKey("world")) {
+            this.teleportPlayer(player, nbtItem, item);
         }
-
-        PlayerInventory inventory = player.getInventory();
-        ItemStack stack = inventory.getItemInMainHand();
-
-        if (stack.getType() != Material.AIR) {
-            NBTItem nbtItem = new NBTItem(stack);
-
-            if (!nbtItem.hasKey("is_teleport_scroll")) {
-                return;
-            }
-
-            if (!player.isSneaking()) {
-                player.sendMessage(ChatColor.YELLOW + "You must be crouching to use teleport scrolls");
-                return;
-            }
-
-            if (nbtItem.hasKey("world")) {
-                this.teleportPlayer(player, nbtItem, stack);
-            }
-            else {
-                this.storeLocation(player, stack);
-            }
+        else {
+            this.storeLocation(player, item);
         }
     }
 
-    private void teleportPlayer(Player player, NBTItem nbtItem, ItemStack stack) throws InterruptedException {
+    private void teleportPlayer(Player player, NBTItem nbtItem, ItemStack item) throws InterruptedException {
         int tier = nbtItem.getInteger("tier");
         if (!this.canTeleport(player, nbtItem)) {
             return;
@@ -70,7 +40,7 @@ public class RightClickListener implements Listener {
         Location location = new Location(tpWorld, x, y, z);
 
         if (tier < 3) {
-            stack.setAmount(stack.getAmount() - 1);
+            item.setAmount(item.getAmount() - 1);
         }
 
         //display particles
@@ -167,5 +137,4 @@ public class RightClickListener implements Listener {
         player.spawnParticle(Particle.SPELL_INSTANT, location, count, offsetX, offsetY, offsetZ);
         player.spawnParticle(Particle.SPELL_WITCH, location, count, offsetX, offsetY, offsetZ);
     }
-
 }
