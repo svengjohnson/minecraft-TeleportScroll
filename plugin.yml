@@ -1,0 +1,15 @@
+name: TeleportScroll
+version: 1.0
+author: Sven Johnson
+main: io.sjohnson.teleportscroll.TeleportScroll
+api-version: 1.18
+commands:
+  rename:
+    description: renames teleport scroll
+    usage: /<command> new name
+  copy:
+    description: copies a teleport scroll
+    usage: /<command>
+  spawnscroll:
+    description: spawns a teleport scroll
+    usage: /<command> tier quantity
