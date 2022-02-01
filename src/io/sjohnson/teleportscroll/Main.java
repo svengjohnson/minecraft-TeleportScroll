@@ -1,11 +1,14 @@
 package io.sjohnson.teleportscroll;
 
 
+import io.sjohnson.teleportscroll.commands.Copy;
+import io.sjohnson.teleportscroll.commands.Rename;
+import io.sjohnson.teleportscroll.commands.SpawnScroll;
+import io.sjohnson.teleportscroll.helpers.CreateRecipe;
+import io.sjohnson.teleportscroll.listeners.RightClickListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
-
-public class TeleportScroll extends JavaPlugin {
+public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new RightClickListener(), this);

@@ -1,5 +1,7 @@
-package io.sjohnson.teleportscroll;
+package io.sjohnson.teleportscroll.helpers;
 
+import io.sjohnson.teleportscroll.Main;
+import io.sjohnson.teleportscroll.helpers.CreateItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,9 +14,9 @@ import org.bukkit.inventory.ShapedRecipe;
 public class CreateRecipe {
 
     Server server;
-    TeleportScroll plugin;
+    Main plugin;
 
-    public CreateRecipe(Server server, TeleportScroll plugin) {
+    public CreateRecipe(Server server, Main plugin) {
         this.server = server;
         this.plugin = plugin;
     }

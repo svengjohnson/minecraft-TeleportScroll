@@ -1,4 +1,4 @@
-package io.sjohnson.teleportscroll;
+package io.sjohnson.teleportscroll.commands;
 
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;

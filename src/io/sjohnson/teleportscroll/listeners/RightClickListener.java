@@ -1,6 +1,7 @@
-package io.sjohnson.teleportscroll;
+package io.sjohnson.teleportscroll.listeners;
 
 import de.tr7zw.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.helpers.CreateItem;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

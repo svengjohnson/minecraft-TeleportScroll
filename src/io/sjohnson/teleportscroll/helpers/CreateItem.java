@@ -1,4 +1,4 @@
-package io.sjohnson.teleportscroll;
+package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
@@ -35,6 +35,44 @@ public class CreateItem {
         NBTItem nbtItem = new NBTItem(item);
         nbtItem.setBoolean("is_teleport_scroll", true);
         nbtItem.setInteger("tier", 1);
+
+        return nbtItem.getItem();
+    }
+
+    public static ItemStack createTeleportScroll(int tier, String name, String lore)
+    {
+        Material material;
+
+        switch (tier)
+        {
+            case 3:
+                material = Material.FLOWER_BANNER_PATTERN;
+                break;
+            default:
+                material = Material.PAPER;
+                break;
+        }
+
+        ItemStack item = new ItemStack(material);
+        ItemMeta Meta = item.getItemMeta();
+        assert Meta != null;
+        Meta.setDisplayName(name);
+        Meta.setLore(CreateItem.formatLore(lore));
+
+        Meta.addItemFlags(
+                ItemFlag.HIDE_ENCHANTS,
+                ItemFlag.HIDE_ATTRIBUTES,
+                ItemFlag.HIDE_UNBREAKABLE,
+                ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_PLACED_ON,
+                ItemFlag.HIDE_POTION_EFFECTS
+        );
+        item.setItemMeta(Meta);
+        item.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1);
+
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setBoolean("is_teleport_scroll", true);
+        nbtItem.setInteger("tier", tier);
 
         return nbtItem.getItem();
     }
