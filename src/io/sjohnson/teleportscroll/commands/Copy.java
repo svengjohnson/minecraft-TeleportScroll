@@ -23,7 +23,12 @@ public class Copy implements CommandExecutor {
                 NBTItem nbtItem = new NBTItem(itemStack);
 
                 if (!ItemHelper.isTeleportScroll(itemStack)) {
-                    player.sendMessage(ChatColor.RED + "This command can only be used on teleport scrolls");
+                    player.sendMessage(ChatColor.RED + "This command can only be used on Teleport Scrolls");
+                    return true;
+                }
+
+                if (ItemHelper.isBedTeleportScroll(itemStack)) {
+                    player.sendMessage(ChatColor.RED + "This command cannot be used on Bed Teleport Scrolls");
                     return true;
                 }
 
@@ -76,15 +81,17 @@ public class Copy implements CommandExecutor {
         if (
                 paperStack == null ||
                         !inventory.contains(Material.ENDER_EYE, 5) ||
-                        !inventory.contains(Material.DIAMOND, 3)
+                        !inventory.contains(Material.DIAMOND_BLOCK, 1) ||
+                        !inventory.contains(Material.CHORUS_FRUIT, 2)
         ) {
-            player.sendMessage(ChatColor.RED + "5x Eye of Ender, 3x Diamond and 1x Paper required");
+            player.sendMessage(ChatColor.RED + "5x Eye of Ender, 2x Chorus Fruit,  1x Diamond Block and 1x Paper required");
             return;
         }
 
         paperStack.setAmount(paperStack.getAmount() - 1);
         inventory.removeItem(new ItemStack(Material.ENDER_EYE, 5));
-        inventory.removeItem(new ItemStack(Material.DIAMOND, 3));
+        inventory.removeItem(new ItemStack(Material.DIAMOND_BLOCK, 1));
+        inventory.removeItem(new ItemStack(Material.CHORUS_FRUIT, 2));
 
         ItemStack newItem = item.clone();
         newItem.setAmount(1);
