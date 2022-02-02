@@ -5,9 +5,9 @@
 
 
 ### Commands:
-`/rename` - Renames a Teleport Scroll (Excluding Bed Teleport Scrolls)
-`/copy` - Copies an existing Teleport Scroll as-is (requires the same materials as crafting from scratch, which are automatically taken from the inventory)
-`/spawnscroll type tier quantity` - An OP only command for spawning Teleport Scrolls. Type 0 is blank and Type 1 is bed.
+- `/rename` - Renames a Teleport Scroll (Excluding Bed Teleport Scrolls)
+- `/copy` - Copies an existing Teleport Scroll as-is (requires the same materials as crafting from scratch, which are automatically taken from the inventory)
+- `/spawnscroll type tier quantity` - An OP only command for spawning Teleport Scrolls. Type 0 is blank and Type 1 is bed.
 
 ### Recipes:
 ![image](https://user-images.githubusercontent.com/37660728/152204909-a6442e14-44f5-481c-b476-c53627ea7f9f.png)
