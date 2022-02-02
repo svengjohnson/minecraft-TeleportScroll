@@ -7,19 +7,21 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar!/" />
         </CLASSES>
-        <JAVADOC />
+        <JAVADOC>
+          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18-R0.1-20211210.131639-28-javadoc.jar!/" />
+        </JAVADOC>
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://F:/Goofs/plugins/item-nbt-api-plugin-2.9.0-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/item-nbt-api-plugin-2.9.0-SNAPSHOT.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
