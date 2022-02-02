@@ -19,7 +19,7 @@ public class Rename implements CommandExecutor {
             String message;
 
             if (args.length < 1) {
-                return true;
+                return false;
             }
 
             if (itemStack.getType() == Material.AIR) {
@@ -32,10 +32,14 @@ public class Rename implements CommandExecutor {
 
             message = joinedArgs.substring(1);
 
+            if (!ItemHelper.isTeleportScroll(itemStack)) {
+                player.sendMessage(ChatColor.RED + "This command can only be used on Teleport Scrolls");
+                return true;
+            }
 
-            if (ItemHelper.isTeleportScroll(itemStack)) {
-                player.sendMessage(ChatColor.RED + "This command can only be used on teleport scrolls");
-                return false;
+            if (ItemHelper.isBedTeleportScroll(itemStack)) {
+                player.sendMessage(ChatColor.RED + "This command cannot be used on Bed Teleport Scrolls");
+                return true;
             }
 
             ItemHelper.renameTeleportScroll(itemStack, message);

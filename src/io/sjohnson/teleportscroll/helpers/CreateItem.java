@@ -41,10 +41,11 @@ public class CreateItem {
         lore = ChatColor.DARK_GREEN + name;
 
         ItemStack item = new ItemStack(material);
+        ItemHelper.setItemName(item, displayName);
+        ItemHelper.setItemLore(item, lore);
+
         ItemMeta Meta = item.getItemMeta();
         assert Meta != null;
-        Meta.setDisplayName(displayName);
-        Meta.setLore(CreateItem.formatLore(lore));
 
         Meta.addItemFlags(
                 ItemFlag.HIDE_ENCHANTS,
@@ -83,21 +84,29 @@ public class CreateItem {
         nbtItem.setInteger("z", z);
 
         ItemStack outputItem = nbtItem.getItem();
-        ItemMeta meta = outputItem.getItemMeta();
-
-        assert meta != null;
-        meta.setDisplayName(name);
-        meta.setLore(CreateItem.formatLore(lore));
-
-        outputItem.setItemMeta(meta);
+        ItemHelper.setItemLore(outputItem, lore);
+        ItemHelper.setItemName(outputItem, name);
+        outputItem.setAmount(1);
 
         return outputItem;
     }
 
-    private static ArrayList<String> formatLore(String lore)
+    public static ItemStack createBedTeleportScroll(int tier)
     {
-        String[] loreText = lore.split(";");
+        ItemStack bedScroll = createTeleportScroll(tier);
 
-        return new ArrayList<>(Arrays.asList(loreText));
+        String name = switch (tier) {
+            case 2 -> ChatColor.YELLOW + "Enhanced Bed Teleport Scroll";
+            case 3 -> ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Bed Teleport Scroll";
+            default -> ChatColor.AQUA + "Bed Teleport Scroll";
+        };
+
+        ItemHelper.setItemName(bedScroll, name);
+        ItemHelper.setItemLore(bedScroll, ChatColor.LIGHT_PURPLE + "Teleports you to your respawn point");
+
+        NBTItem nbtItem = new NBTItem(bedScroll);
+        nbtItem.setBoolean("teleport_to_bed", true);
+
+        return nbtItem.getItem();
     }
 }

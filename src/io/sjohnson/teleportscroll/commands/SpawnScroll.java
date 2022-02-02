@@ -15,17 +15,23 @@ public class SpawnScroll implements CommandExecutor {
             if (!player.isOp()) {
                 return true;
             }
-            if (args.length < 2) {
-                player.sendMessage(ChatColor.RED + "Syntax: /spawnscroll tier quantity");
+            if (args.length < 3) {
+                player.sendMessage(ChatColor.RED + "Syntax: /spawnscroll type tier quantity");
+                player.sendMessage(ChatColor.RED + "Types: 0 - blank, 1 - bed");
                 return true;
             }
             
-            int tier = Integer.parseInt(args[0]);
-            int quantity = Math.min(Integer.parseInt(args[1]), 64);
+            int type = Integer.parseInt(args[0]);
+            int tier = Integer.parseInt(args[1]);
+            int quantity = Math.min(Integer.parseInt(args[2]), 64);
 
             ItemStack item;
 
-            item = CreateItem.createTeleportScroll(tier);
+            if (type == 0) {
+                item = CreateItem.createTeleportScroll(tier);
+            } else {
+                item = CreateItem.createBedTeleportScroll(tier);
+            }
 
             item.setAmount(quantity);
             player.getInventory().addItem(item);

@@ -2,6 +2,7 @@ package io.sjohnson.teleportscroll.handlers;
 
 import de.tr7zw.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.CreateItem;
+import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,20 +18,35 @@ public class ActivateTeleportScrollHandler {
             return;
         }
 
-        if (nbtItem.hasKey("world")) {
-            this.teleportPlayer(player, nbtItem, item);
+        if (ItemHelper.isBedTeleportScroll(item)) {
+            this.teleportToBed(player, nbtItem, item);
+            return;
         }
-        else {
+
+        if (nbtItem.hasKey("world")) {
+            this.teleportToDestination(player, nbtItem, item);
+        } else {
             this.storeLocation(player, item);
         }
     }
 
-    private void teleportPlayer(Player player, NBTItem nbtItem, ItemStack item) throws InterruptedException {
-        int tier = nbtItem.getInteger("tier");
-        if (!this.canTeleport(player, nbtItem)) {
+    private void teleportToBed(Player player, NBTItem nbtItem, ItemStack item) throws InterruptedException {
+        Location bedSpawnLocation = player.getBedSpawnLocation();
+
+        if (bedSpawnLocation == null) {
+            player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
             return;
         }
 
+        // If player is not there already
+        if (bedSpawnLocation.getBlock().equals(player.getLocation().getBlock())) {
+            return;
+        }
+
+        this.teleport(player, bedSpawnLocation, nbtItem, item);
+    }
+
+    private void teleportToDestination(Player player, NBTItem nbtItem, ItemStack item) throws InterruptedException {
         String world = nbtItem.getString("world");
         int x = nbtItem.getInteger("x");
         int y = nbtItem.getInteger("y");
@@ -38,6 +54,15 @@ public class ActivateTeleportScrollHandler {
 
         World tpWorld = Bukkit.getWorld(world);
         Location location = new Location(tpWorld, x, y, z);
+
+        this.teleport(player,location, nbtItem, item);
+    }
+
+    private void teleport(Player player, Location location, NBTItem nbtItem, ItemStack item) throws InterruptedException {
+        int tier = nbtItem.getInteger("tier");
+        if (!this.canTeleport(player, nbtItem)) {
+            return;
+        }
 
         if (tier < 3) {
             item.setAmount(item.getAmount() - 1);
@@ -62,17 +87,16 @@ public class ActivateTeleportScrollHandler {
         TeleportParticles(player);
     }
 
-    private boolean canTeleport(Player player, NBTItem nbtItem)
-    {
+    private boolean canTeleport(Player player, NBTItem nbtItem) {
         int tier = nbtItem.getInteger("tier");
 
         if (this.alreadyThere(player.getLocation(), nbtItem)) {
-            player.sendMessage(ChatColor.YELLOW + "You are already here!");
+            //player.sendMessage(ChatColor.YELLOW + "You are already here!");
             return false;
         }
 
-        if (!this.sameWorld(player, nbtItem) && tier < 2) {
-            player.sendMessage(ChatColor.YELLOW + "Can't teleport to a different realm with this scroll!");
+        if (!this.sameWorldCheck(player, nbtItem) && tier < 2) {
+            player.sendMessage(ChatColor.YELLOW + "Can't teleport to a different dimension with this scroll!");
             return false;
         }
 
@@ -84,13 +108,25 @@ public class ActivateTeleportScrollHandler {
         return true;
     }
 
-    private boolean sameWorld(Player player, NBTItem nbtItem)
+    private boolean sameWorldCheck(Player player, NBTItem nbtItem)
     {
+        if (ItemHelper.isBedTeleportScroll(nbtItem.getItem())) {
+            return sameWorldBed(player);
+        }
+
+        return sameWorld(player, nbtItem);
+    }
+
+    private boolean sameWorld(Player player, NBTItem nbtItem) {
         return player.getWorld().getName().equals(nbtItem.getString("world"));
     }
 
-    private boolean alreadyThere(Location currentLocation, NBTItem nbtItem)
+    private boolean sameWorldBed(Player player)
     {
+        return player.getWorld().getName().equals(player.getBedSpawnLocation().getWorld().getName());
+    }
+
+    private boolean alreadyThere(Location currentLocation, NBTItem nbtItem) {
         String currentWorld = currentLocation.getWorld().getName();
         int currentX = ((int) currentLocation.getX());
         int currentY = ((int) currentLocation.getY());
@@ -104,8 +140,7 @@ public class ActivateTeleportScrollHandler {
         return currentWorld.equals(world) && currentX == x && currentY == y && currentZ == z;
     }
 
-    private void storeLocation(Player player, ItemStack stack)
-    {
+    private void storeLocation(Player player, ItemStack stack) {
         if (player.getInventory().firstEmpty() == -1) {
             player.sendMessage(ChatColor.RED + "Need at least 1 free inventory space");
             return;
