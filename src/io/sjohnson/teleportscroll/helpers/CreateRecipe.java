@@ -26,6 +26,7 @@ public class CreateRecipe {
         this.server.addRecipe(this.bedScroll());
         this.server.addRecipe(this.bedScrollT2());
         this.server.addRecipe(this.bedScrollT3());
+        this.server.addRecipe(this.lifesaver());
     }
 
     public ShapedRecipe teleportScroll() {
@@ -139,6 +140,25 @@ public class CreateRecipe {
         Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
         Recipe.setIngredient('D', new RecipeChoice.ExactChoice(new ItemStack(Material.DIAMOND_BLOCK)));
         Recipe.setIngredient('F', new RecipeChoice.ExactChoice(new ItemStack(Material.CHORUS_FRUIT)));
+        return Recipe;
+    }
+
+    public ShapedRecipe lifesaver() {
+        NamespacedKey key = new NamespacedKey(plugin, "lifesaver");
+
+        ItemStack lifesaver = CreateItem.createLifesaver();
+
+        ShapedRecipe Recipe = new ShapedRecipe(key, lifesaver);
+        Recipe.shape(
+                "DSD",
+                "EGE",
+                "DSD"
+        );
+
+        Recipe.setIngredient('D', new RecipeChoice.ExactChoice(new ItemStack(Material.DIAMOND)));
+        Recipe.setIngredient('G', new RecipeChoice.ExactChoice(new ItemStack(Material.EMERALD)));
+        Recipe.setIngredient('S', new RecipeChoice.ExactChoice(new ItemStack(Material.SHULKER_SHELL)));
+        Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
         return Recipe;
     }
 }

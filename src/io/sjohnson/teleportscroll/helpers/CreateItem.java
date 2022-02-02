@@ -8,8 +8,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.UUID;
 
 public class CreateItem {
     public static ItemStack createTeleportScroll(int tier)
@@ -107,6 +106,31 @@ public class CreateItem {
         NBTItem nbtItem = new NBTItem(bedScroll);
         nbtItem.setBoolean("teleport_to_bed", true);
 
+        return nbtItem.getItem();
+    }
+
+    public static ItemStack createLifesaver()
+    {
+        ItemStack lifesaver = new ItemStack(Material.EMERALD);
+        ItemHelper.setItemName(lifesaver, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Lifesaver");
+        ItemHelper.setItemLore(lifesaver, ChatColor.GOLD + "This item will prevent you from;" + ChatColor.GOLD + "taking fatal damage by teleporting;" + ChatColor.GOLD + "you to your bed");
+
+        ItemMeta Meta = lifesaver.getItemMeta();
+        assert Meta != null;
+
+        Meta.addItemFlags(
+                ItemFlag.HIDE_ATTRIBUTES,
+                ItemFlag.HIDE_UNBREAKABLE,
+                ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_PLACED_ON,
+                ItemFlag.HIDE_POTION_EFFECTS
+        );
+        lifesaver.setItemMeta(Meta);
+        lifesaver.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+
+        NBTItem nbtItem = new NBTItem(lifesaver);
+        nbtItem.setBoolean("is_lifesaver", true);
+        nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString()); // this should make the item non-stackable
         return nbtItem.getItem();
     }
 }

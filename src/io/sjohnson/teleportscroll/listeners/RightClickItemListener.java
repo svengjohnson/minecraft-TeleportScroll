@@ -38,6 +38,7 @@ public class RightClickItemListener implements Listener {
 
         if (ItemHelper.isTeleportScroll(mainHand)) {
             new ActivateTeleportScrollHandler(player, mainHand);
+            event.setCancelled(true);
         }
     }
 }

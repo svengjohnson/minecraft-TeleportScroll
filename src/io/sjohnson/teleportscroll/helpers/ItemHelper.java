@@ -2,6 +2,9 @@ package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -26,6 +29,13 @@ public class ItemHelper
         NBTItem nbtItem = new NBTItem(item);
 
         return nbtItem.getBoolean("teleport_to_bed");
+    }
+
+    public static boolean isLifesaver(ItemStack item)
+    {
+        NBTItem nbtItem = new NBTItem(item);
+
+        return nbtItem.getBoolean("is_lifesaver");
     }
 
     public static void renameTeleportScroll(ItemStack item, String name)
@@ -71,5 +81,17 @@ public class ItemHelper
         String[] loreText = lore.split(";");
 
         return new ArrayList<>(Arrays.asList(loreText));
+    }
+
+    public static int getEmptyInventorySlots(Inventory inventory) {
+        int i = 0;
+
+        for (ItemStack item : inventory.getContents()) {
+            if (item == null || item.getType() == Material.AIR) {
+                i++;
+            }
+        }
+
+        return i;
     }
 }

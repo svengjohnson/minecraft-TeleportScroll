@@ -13,3 +13,6 @@ commands:
   spawnscroll:
     description: spawns a teleport scroll
     usage: /<command> tier quantity
+  lifesaver:
+    description: spawns a lifesaver
+    usage: /<command> quantity

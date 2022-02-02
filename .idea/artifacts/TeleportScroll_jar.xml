@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" build-on-make="true" name="TeleportScroll:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/TeleportScroll_jar</output-path>
+    <output-path>$PROJECT_DIR$/out/artifacts/jar</output-path>
     <root id="archive" name="TeleportScroll.jar">
       <element id="module-output" name="TeleportScroll" />
       <element id="extracted-dir" path="$USER_HOME$/Downloads/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar" path-in-jar="/" />

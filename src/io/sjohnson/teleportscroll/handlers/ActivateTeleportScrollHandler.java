@@ -3,6 +3,7 @@ package io.sjohnson.teleportscroll.handlers;
 import de.tr7zw.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.CreateItem;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
+import io.sjohnson.teleportscroll.helpers.ParticleHelper;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -69,7 +70,7 @@ public class ActivateTeleportScrollHandler {
         }
 
         //display particles
-        TeleportParticles(player);
+        ParticleHelper.teleportParticles(player);
 
         // play sound
         player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, (float) 0.5, 2);
@@ -84,7 +85,7 @@ public class ActivateTeleportScrollHandler {
         player.teleport(location);
 
         // display particles at the destination
-        TeleportParticles(player);
+        ParticleHelper.teleportParticles(player);
     }
 
     private boolean canTeleport(Player player, NBTItem nbtItem) {
@@ -160,16 +161,5 @@ public class ActivateTeleportScrollHandler {
 
         player.getInventory().addItem(teleportScroll);
         stack.setAmount(stack.getAmount() - 1);
-    }
-
-    private void TeleportParticles(Player player) {
-        Location location = player.getLocation();
-        int count = 50;
-        double offsetX = 1;
-        double offsetY = 2;
-        double offsetZ = 1;
-
-        player.spawnParticle(Particle.SPELL_INSTANT, location, count, offsetX, offsetY, offsetZ);
-        player.spawnParticle(Particle.SPELL_WITCH, location, count, offsetX, offsetY, offsetZ);
     }
 }

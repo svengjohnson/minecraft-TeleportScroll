@@ -66,6 +66,10 @@ public class Copy implements CommandExecutor {
             return;
         }
 
+        if (ItemHelper.getEmptyInventorySlots(inventory) == 0) {
+            player.sendMessage(ChatColor.YELLOW + "You need at least 1 free inventory space for this");
+        }
+
         paperStack.setAmount(paperStack.getAmount() - 8);
         inventory.removeItem(new ItemStack(Material.ENDER_PEARL, 1));
 
@@ -86,6 +90,10 @@ public class Copy implements CommandExecutor {
         ) {
             player.sendMessage(ChatColor.RED + "5x Eye of Ender, 2x Chorus Fruit,  1x Diamond Block and 1x Paper required");
             return;
+        }
+
+        if (ItemHelper.getEmptyInventorySlots(inventory) == 0) {
+            player.sendMessage(ChatColor.YELLOW + "You need at least 1 free inventory space for this");
         }
 
         paperStack.setAmount(paperStack.getAmount() - 1);
@@ -109,6 +117,10 @@ public class Copy implements CommandExecutor {
         ) {
             player.sendMessage(ChatColor.RED + "1x Eye of Ender, 1x Diamond and 7x Paper required");
             return;
+        }
+
+        if (ItemHelper.getEmptyInventorySlots(inventory) == 0) {
+            player.sendMessage(ChatColor.YELLOW + "You need at least 1 free inventory space for this");
         }
 
         paperStack.setAmount(paperStack.getAmount() - 7);
