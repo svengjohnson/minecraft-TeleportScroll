@@ -133,4 +133,28 @@ public class CreateItem {
         nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString()); // this should make the item non-stackable
         return nbtItem.getItem();
     }
+
+    public static ItemStack createInstantSteak()
+    {
+        ItemStack steak = new ItemStack(Material.COOKED_BEEF);
+        ItemHelper.setItemName(steak, ChatColor.AQUA + "Instant Steak");
+        ItemMeta Meta = steak.getItemMeta();
+        assert Meta != null;
+
+        Meta.addItemFlags(
+                ItemFlag.HIDE_ENCHANTS,
+                ItemFlag.HIDE_ATTRIBUTES,
+                ItemFlag.HIDE_UNBREAKABLE,
+                ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_PLACED_ON,
+                ItemFlag.HIDE_POTION_EFFECTS
+        );
+        steak.setItemMeta(Meta);
+        steak.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+
+        NBTItem nbtItem = new NBTItem(steak);
+        nbtItem.setBoolean("is_instant_steak", true);
+
+        return nbtItem.getItem();
+    }
 }

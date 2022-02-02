@@ -1,6 +1,7 @@
 package io.sjohnson.teleportscroll.listeners;
 
 import io.sjohnson.teleportscroll.handlers.ActivateTeleportScrollHandler;
+import io.sjohnson.teleportscroll.handlers.InstantSteakHandler;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -39,7 +40,15 @@ public class RightClickItemListener implements Listener {
         if (ItemHelper.isTeleportScroll(mainHand)) {
             new ActivateTeleportScrollHandler(player, mainHand);
             event.setCancelled(true);
+            return;
         }
+
+        if (ItemHelper.isInstantSteak(mainHand)) {
+            new InstantSteakHandler(player, mainHand);
+            event.setCancelled(true);
+            return;
+        }
+
     }
 }
 
