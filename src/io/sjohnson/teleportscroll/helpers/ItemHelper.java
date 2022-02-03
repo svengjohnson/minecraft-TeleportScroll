@@ -56,6 +56,16 @@ public class ItemHelper
         setItemName(item, newDisplayName);
     }
 
+    public static void setCustomModel(ItemStack item, int model)
+    {
+        ItemMeta meta = item.getItemMeta();
+
+        assert meta != null;
+        meta.setCustomModelData(model);
+
+        item.setItemMeta(meta);
+    }
+
     public static void setItemLore(ItemStack item, String lore)
     {
         ItemMeta meta = item.getItemMeta();

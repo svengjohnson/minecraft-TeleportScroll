@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 public class Copy implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -103,7 +105,10 @@ public class Copy implements CommandExecutor {
 
         ItemStack newItem = item.clone();
         newItem.setAmount(1);
-        inventory.addItem(newItem);
+        NBTItem nbtItem = new NBTItem(newItem);
+        nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
+
+        inventory.addItem(nbtItem.getItem());
     }
 
     private void dupeTier2(Player player, Inventory inventory, ItemStack item)

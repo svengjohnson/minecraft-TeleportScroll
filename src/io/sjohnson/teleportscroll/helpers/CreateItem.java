@@ -18,22 +18,26 @@ public class CreateItem {
         String name;
         String displayName;
         String lore;
+        int customModel;
 
         switch (tier) {
             case 3 -> {
-                material = Material.FLOWER_BANNER_PATTERN;
+                material = Material.PAPER;
                 name = "Blank Eternal Teleport Scroll";
                 displayName = ChatColor.YELLOW + name;
+                customModel = 10003;
             }
             case 2 -> {
                 material = Material.PAPER;
                 name = "Blank Enhanced Teleport Scroll";
                 displayName = ChatColor.YELLOW + name;
+                customModel = 10002;
             }
             default -> {
                 material = Material.PAPER;
                 name = "Blank Teleport Scroll";
                 displayName = ChatColor.WHITE + name;
+                customModel = 10001;
             }
         }
 
@@ -42,6 +46,7 @@ public class CreateItem {
         ItemStack item = new ItemStack(material);
         ItemHelper.setItemName(item, displayName);
         ItemHelper.setItemLore(item, lore);
+        ItemHelper.setCustomModel(item, customModel);
 
         ItemMeta Meta = item.getItemMeta();
         assert Meta != null;
@@ -61,6 +66,11 @@ public class CreateItem {
         nbtItem.setBoolean("is_teleport_scroll", true);
         nbtItem.setInteger("tier", tier);
 
+        if (tier == 3) {
+            // prevent stacking
+            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
+        }
+
         return nbtItem.getItem();
     }
 
@@ -70,11 +80,23 @@ public class CreateItem {
         NBTItem nbtItem = new NBTItem(item.clone());
 
         int tier = nbtItem.getInteger("tier");
-        String name = switch (tier) {
-            case 2 -> ChatColor.YELLOW + "Enhanced Teleport Scroll";
-            case 3 -> ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Teleport Scroll";
-            default -> ChatColor.AQUA + "Teleport Scroll";
-        };
+        String name;
+        int customModel;
+
+        switch (tier) {
+            case 2 -> {
+                name = ChatColor.YELLOW + "Enhanced Teleport Scroll";
+                customModel = 10005;
+            }
+            case 3 -> {
+                name = ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Teleport Scroll";
+                customModel = 10006;
+            }
+            default -> {
+                name = ChatColor.AQUA + "Teleport Scroll";
+                customModel = 10004;
+            }
+        }
 
         String lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", world, x, y, z, name);
         nbtItem.setString("world", world);
@@ -85,6 +107,7 @@ public class CreateItem {
         ItemStack outputItem = nbtItem.getItem();
         ItemHelper.setItemLore(outputItem, lore);
         ItemHelper.setItemName(outputItem, name);
+        ItemHelper.setCustomModel(outputItem, customModel);
         outputItem.setAmount(1);
 
         return outputItem;
@@ -93,15 +116,28 @@ public class CreateItem {
     public static ItemStack createBedTeleportScroll(int tier)
     {
         ItemStack bedScroll = createTeleportScroll(tier);
+        String name;
+        int customModel;
 
-        String name = switch (tier) {
-            case 2 -> ChatColor.YELLOW + "Enhanced Bed Teleport Scroll";
-            case 3 -> ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Bed Teleport Scroll";
-            default -> ChatColor.AQUA + "Bed Teleport Scroll";
-        };
+        switch (tier) {
+            case 2 -> {
+                name = ChatColor.YELLOW + "Enhanced Bed Teleport Scroll";
+                customModel = 10005;
+            }
+            case 3 -> {
+                name = ChatColor.YELLOW + "" + ChatColor.BOLD + "Eternal Bed Teleport Scroll";
+                customModel = 10006;
+            }
+            default -> {
+                name = ChatColor.AQUA + "Bed Teleport Scroll";
+                customModel = 10004;
+            }
+        }
 
         ItemHelper.setItemName(bedScroll, name);
         ItemHelper.setItemLore(bedScroll, ChatColor.LIGHT_PURPLE + "Teleports you to your respawn point");
+        ItemHelper.setCustomModel(bedScroll, customModel);
+        bedScroll.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
 
         NBTItem nbtItem = new NBTItem(bedScroll);
         nbtItem.setBoolean("teleport_to_bed", true);
@@ -130,7 +166,8 @@ public class CreateItem {
 
         NBTItem nbtItem = new NBTItem(lifesaver);
         nbtItem.setBoolean("is_lifesaver", true);
-        nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString()); // this should make the item non-stackable
+        // prevent stacking
+        nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString());
         return nbtItem.getItem();
     }
 }
