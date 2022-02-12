@@ -129,9 +129,9 @@ public class ActivateTeleportScrollHandler {
 
     private boolean alreadyThere(Location currentLocation, NBTItem nbtItem) {
         String currentWorld = currentLocation.getWorld().getName();
-        int currentX = ((int) currentLocation.getX());
+        int currentX = ((int) currentLocation.getX() - 1);
         int currentY = ((int) currentLocation.getY());
-        int currentZ = ((int) currentLocation.getZ());
+        int currentZ = ((int) currentLocation.getZ() - 1);
 
         String world = nbtItem.getString("world");
         int x = nbtItem.getInteger("x");
