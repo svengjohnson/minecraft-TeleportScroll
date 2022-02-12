@@ -49,9 +49,9 @@ public class ActivateTeleportScrollHandler {
 
     private void teleportToDestination(Player player, NBTItem nbtItem, ItemStack item) throws InterruptedException {
         String world = nbtItem.getString("world");
-        int x = nbtItem.getInteger("x");
+        double x = nbtItem.getInteger("x") - 0.5;
         int y = nbtItem.getInteger("y");
-        int z = nbtItem.getInteger("z");
+        double z = nbtItem.getInteger("z") - 0.5;
 
         World tpWorld = Bukkit.getWorld(world);
         Location location = new Location(tpWorld, x, y, z);

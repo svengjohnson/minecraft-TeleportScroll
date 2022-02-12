@@ -16,3 +16,6 @@ commands:
   lifesaver:
     description: spawns a lifesaver
     usage: /<command> quantity
+  dev:
+    description: developer use only
+    usage: /<command>
