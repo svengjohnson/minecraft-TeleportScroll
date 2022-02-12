@@ -3,6 +3,9 @@ package io.sjohnson.teleportscroll.listeners;
 import io.sjohnson.teleportscroll.handlers.ActivateTeleportScrollHandler;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
+import org.bukkit.block.EnderChest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,9 +21,11 @@ public class RightClickItemListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) throws InterruptedException {
         Player player = event.getPlayer();
         Action action = event.getAction();
+        Block clickedBlock = event.getClickedBlock();
+        assert clickedBlock != null;
 
-        // The action has to be a right click
-        if (!(action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        if (!ItemHelper.isTeleportScroll(mainHand)) {
             return;
         }
 
@@ -29,17 +34,28 @@ public class RightClickItemListener implements Listener {
             return;
         }
 
-        ItemStack mainHand = player.getInventory().getItemInMainHand();
-
-        // Don't run anything for air;
-        if (mainHand.getType() == Material.AIR) {
+        // The action has to be a right click
+        if (!(action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK)) {
             return;
         }
 
-        if (ItemHelper.isTeleportScroll(mainHand)) {
-            new ActivateTeleportScrollHandler(player, mainHand);
-            event.setCancelled(true);
+        // If the target block is a Container, (e.g. Chest), do nothing
+        if (clickedBlock.getState() instanceof Container) {
+            return;
         }
+
+        // Do nothing for Ender Chest either (which apparently is not a Container)
+        if (clickedBlock.getState() instanceof EnderChest) {
+            return;
+        }
+
+        // Do nothing for Crafting Table too
+        if (clickedBlock.getType() == Material.CRAFTING_TABLE) {
+            return;
+        }
+
+        new ActivateTeleportScrollHandler(player, mainHand);
+        event.setCancelled(true);
     }
 }
 
