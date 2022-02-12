@@ -42,17 +42,35 @@ public class EndermanDeathHandler {
 
         int roll = (int)(Math.random()*(max-min+1)+min);
 
+        boolean is_the_end = location.getWorld().getName().equals("world_the_end");
+
         ItemStack drop;
 
-        // 20% chance on getting a 2x blank tier 1 scroll as a drop
-        if (roll < 200) {
+        int blank_scroll_req;
+
+        if (is_the_end) {
+            blank_scroll_req = 20;
+        } else {
+            blank_scroll_req = 200;
+        }
+
+        // 20% chance on getting a 2x blank tier 1 scroll as a drop, 2% in the end
+        if (roll < blank_scroll_req) {
             drop = CreateItem.createTeleportScroll(1);
             drop.setAmount(2);
             return drop;
         }
 
-        // 5% chance on rolling a Structure Teleport Scroll
-        if (roll < 250) {
+        int structure_scroll_req;
+
+        if (is_the_end) {
+            structure_scroll_req = 25;
+        } else {
+            structure_scroll_req = 250;
+        }
+
+        // 5% chance on rolling a Structure Teleport Scroll, 0.5% in the end
+        if (roll < structure_scroll_req) {
             String worldName = this.getRandomWorld();
             StructureType structure = this.getRandomStructure(worldName);
             World world = Bukkit.getWorld(worldName);
@@ -92,9 +110,17 @@ public class EndermanDeathHandler {
             return teleportScroll;
         }
 
-        //90% chance on an ender pearl
 
-        if (roll < 900) {
+        int pearl_req;
+
+        if (is_the_end) {
+            pearl_req = 0;
+        } else {
+            pearl_req = 1000;
+        }
+
+        // otherwise always drop a pearl, except in the end
+        if (roll < pearl_req) {
             return new ItemStack(Material.ENDER_PEARL);
         }
 
@@ -274,7 +300,7 @@ public class EndermanDeathHandler {
         overworld.add(StructureType.SWAMP_HUT);
         overworld.add(StructureType.OCEAN_MONUMENT);
         overworld.add(StructureType.WOODLAND_MANSION);
-        overworld.add(StructureType.BURIED_TREASURE);
+        //overworld.add(StructureType.BURIED_TREASURE);
         overworld.add(StructureType.SHIPWRECK);
         overworld.add(StructureType.PILLAGER_OUTPOST);
         overworld.add(StructureType.RUINED_PORTAL);
