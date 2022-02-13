@@ -22,7 +22,6 @@ public class RightClickItemListener implements Listener {
         Player player = event.getPlayer();
         Action action = event.getAction();
         Block clickedBlock = event.getClickedBlock();
-        assert clickedBlock != null;
 
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         if (!ItemHelper.isTeleportScroll(mainHand)) {
@@ -39,19 +38,21 @@ public class RightClickItemListener implements Listener {
             return;
         }
 
-        // If the target block is a Container, (e.g. Chest), do nothing
-        if (clickedBlock.getState() instanceof Container) {
-            return;
-        }
+        if (clickedBlock != null) {
+            // If the target block is a Container, (e.g. Chest), do nothing
+            if (clickedBlock.getState() instanceof Container) {
+                return;
+            }
 
-        // Do nothing for Ender Chest either (which apparently is not a Container)
-        if (clickedBlock.getState() instanceof EnderChest) {
-            return;
-        }
+            // Do nothing for Ender Chest either (which apparently is not a Container)
+            if (clickedBlock.getState() instanceof EnderChest) {
+                return;
+            }
 
-        // Do nothing for Crafting Table too
-        if (clickedBlock.getType() == Material.CRAFTING_TABLE) {
-            return;
+            // Do nothing for Crafting Table too
+            if (clickedBlock.getType() == Material.CRAFTING_TABLE) {
+                return;
+            }
         }
 
         new ActivateTeleportScrollHandler(player, mainHand);
