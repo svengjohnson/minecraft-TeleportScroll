@@ -81,7 +81,18 @@ public class CreateItem {
 
         int tier = nbtItem.getInteger("tier");
         String name;
+        String direction;
         int customModel;
+
+        if (yaw == 180) {
+            direction = "N";
+        } else if (yaw == -90) {
+            direction = "E";
+        } else if (yaw == 90) {
+            direction = "W";
+        } else {
+            direction = "S";
+        }
 
         switch (tier) {
             case 2 -> {
@@ -98,7 +109,7 @@ public class CreateItem {
             }
         }
 
-        String lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s;%s", world, x, y, z, name);
+        String lore = String.format(ChatColor.WHITE + "%s X %s Y %s Z %s %s;%s", world, x, y, z, direction, name);
         nbtItem.setString("world", world);
         nbtItem.setInteger("x", x);
         nbtItem.setInteger("y", y);
