@@ -164,8 +164,6 @@ public class ActivateTeleportScrollHandler {
         int z = ((int) location.getZ()) - 1;
         float yaw = this.getYaw(location);
 
-        player.sendMessage(String.valueOf(yaw));
-
         ItemStack teleportScroll;
 
         teleportScroll = CreateItem.createTeleportScrollWithCoords(stack, w, x, y, z, yaw);
