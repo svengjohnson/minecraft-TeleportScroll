@@ -74,7 +74,7 @@ public class CreateItem {
         return nbtItem.getItem();
     }
 
-    public static ItemStack createTeleportScrollWithCoords(ItemStack item, String world, int x, int y, int z)
+    public static ItemStack createTeleportScrollWithCoords(ItemStack item, String world, int x, int y, int z, float yaw)
     {
 
         NBTItem nbtItem = new NBTItem(item.clone());
@@ -103,6 +103,7 @@ public class CreateItem {
         nbtItem.setInteger("x", x);
         nbtItem.setInteger("y", y);
         nbtItem.setInteger("z", z);
+        nbtItem.setFloat("yaw", yaw);
 
         ItemStack outputItem = nbtItem.getItem();
         ItemHelper.setItemLore(outputItem, lore);

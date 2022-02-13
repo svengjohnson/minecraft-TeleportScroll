@@ -104,7 +104,7 @@ public class EndermanDeathHandler {
             int tier = (int)(Math.random()*(2-1+1)+1);
 
             ItemStack blankScroll = CreateItem.createTeleportScroll(tier);
-            ItemStack teleportScroll = CreateItem.createTeleportScrollWithCoords(blankScroll, world.getName(), tp_x, tp_y, tp_z);
+            ItemStack teleportScroll = CreateItem.createTeleportScrollWithCoords(blankScroll, world.getName(), tp_x, tp_y, tp_z, 0);
             ItemHelper.renameTeleportScroll(teleportScroll, name);
 
             return teleportScroll;

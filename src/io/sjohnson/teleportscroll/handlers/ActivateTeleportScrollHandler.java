@@ -52,9 +52,17 @@ public class ActivateTeleportScrollHandler {
         double x = nbtItem.getInteger("x") + 0.5;
         int y = nbtItem.getInteger("y");
         double z = nbtItem.getInteger("z") + 0.5;
+        float yaw;
+
+        if (nbtItem.hasKey("yaw")) {
+            yaw = nbtItem.getFloat("yaw");
+        } else {
+            yaw = 0;
+        }
 
         World tpWorld = Bukkit.getWorld(world);
         Location location = new Location(tpWorld, x, y, z);
+        location.setYaw(yaw);
 
         this.teleport(player,location, nbtItem, item);
     }
@@ -154,10 +162,11 @@ public class ActivateTeleportScrollHandler {
         int x = ((int) location.getX()) - 1;
         int y = ((int) Math.round(location.getY()));
         int z = ((int) location.getZ()) - 1;
+        float yaw = location.getYaw();
 
         ItemStack teleportScroll;
 
-        teleportScroll = CreateItem.createTeleportScrollWithCoords(stack, w, x, y, z);
+        teleportScroll = CreateItem.createTeleportScrollWithCoords(stack, w, x, y, z, yaw);
 
         player.getInventory().addItem(teleportScroll);
         stack.setAmount(stack.getAmount() - 1);
