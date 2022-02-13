@@ -130,7 +130,7 @@ public class ActivateTeleportScrollHandler {
     private boolean alreadyThere(Location currentLocation, NBTItem nbtItem) {
         String currentWorld = currentLocation.getWorld().getName();
         int currentX = ((int) currentLocation.getX() - 1);
-        int currentY = ((int) currentLocation.getY());
+        int currentY = ((int) Math.round(currentLocation.getY()));
         int currentZ = ((int) currentLocation.getZ() - 1);
 
         String world = nbtItem.getString("world");
@@ -151,9 +151,9 @@ public class ActivateTeleportScrollHandler {
         Location location = player.getLocation();
 
         String w = world.getName();
-        int x = ((int) location.getX());
-        int y = ((int) location.getY());
-        int z = ((int) location.getZ());
+        int x = ((int) location.getX()) - 1;
+        int y = ((int) Math.round(location.getY()));
+        int z = ((int) location.getZ()) - 1;
 
         ItemStack teleportScroll;
 
