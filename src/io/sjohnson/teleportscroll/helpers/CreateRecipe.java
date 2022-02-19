@@ -55,12 +55,12 @@ public class CreateRecipe {
 
         ShapedRecipe Recipe = new ShapedRecipe(key, enhancedTeleportScroll);
         Recipe.shape(
-                "PDP",
+                "PPP",
                 "PEP",
-                "PPP"
+                "PGP"
         );
 
-        Recipe.setIngredient('D', new RecipeChoice.ExactChoice(new ItemStack(Material.DIAMOND)));
+        Recipe.setIngredient('G', new RecipeChoice.ExactChoice(new ItemStack(Material.GOLD_INGOT)));
         Recipe.setIngredient('P', new RecipeChoice.ExactChoice(new ItemStack(Material.PAPER)));
         Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
         return Recipe;
@@ -112,7 +112,7 @@ public class CreateRecipe {
         Recipe.shape(
                 "PEP",
                 "PCP",
-                "GGG"
+                "PGP"
         );
 
         Recipe.setIngredient('P', new RecipeChoice.ExactChoice(new ItemStack(Material.PAPER)));
@@ -150,14 +150,14 @@ public class CreateRecipe {
 
         ShapedRecipe Recipe = new ShapedRecipe(key, lifesaver);
         Recipe.shape(
-                "DSD",
+                "DCD",
                 "EGE",
-                "DSD"
+                "DCD"
         );
 
         Recipe.setIngredient('D', new RecipeChoice.ExactChoice(new ItemStack(Material.DIAMOND)));
         Recipe.setIngredient('G', new RecipeChoice.ExactChoice(new ItemStack(Material.EMERALD)));
-        Recipe.setIngredient('S', new RecipeChoice.ExactChoice(new ItemStack(Material.SHULKER_SHELL)));
+        Recipe.setIngredient('C', new RecipeChoice.ExactChoice(new ItemStack(Material.CHORUS_FRUIT)));
         Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
         return Recipe;
     }
