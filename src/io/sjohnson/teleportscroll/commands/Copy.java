@@ -118,9 +118,9 @@ public class Copy implements CommandExecutor {
         if (
                 paperStack == null ||
                 !inventory.contains(Material.ENDER_EYE, 1) ||
-                !inventory.contains(Material.DIAMOND, 1)
+                !inventory.contains(Material.GOLD_INGOT, 1)
         ) {
-            player.sendMessage(ChatColor.RED + "1x Eye of Ender, 1x Diamond and 7x Paper required");
+            player.sendMessage(ChatColor.RED + "1x Eye of Ender, 1x Gold Ingot and 7x Paper required");
             return;
         }
 
@@ -130,7 +130,7 @@ public class Copy implements CommandExecutor {
 
         paperStack.setAmount(paperStack.getAmount() - 7);
         inventory.removeItem(new ItemStack(Material.ENDER_EYE, 1));
-        inventory.removeItem(new ItemStack(Material.DIAMOND, 1));
+        inventory.removeItem(new ItemStack(Material.GOLD_INGOT, 1));
 
         ItemStack newItem = item.clone();
         newItem.setAmount(8);

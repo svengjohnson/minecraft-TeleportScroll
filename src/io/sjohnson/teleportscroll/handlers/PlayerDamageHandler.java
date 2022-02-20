@@ -63,7 +63,7 @@ public class PlayerDamageHandler {
 
         if (bedSpawnLocation == null) {
             player.sendMessage(ChatColor.RED + "Your lifesaver would have saved you...");
-            player.sendMessage(ChatColor.RED + "..but you do not have a bed spawn set or your bed is obstructed");
+            player.sendMessage(ChatColor.RED + "...but you do not have a bed spawn set or your bed is obstructed");
             player.sendMessage(ChatColor.RED + "...so GET REKT");
             return;
         }
@@ -71,7 +71,7 @@ public class PlayerDamageHandler {
         event.setCancelled(true);
 
         // remove lifesaver
-        lifesaver.setAmount(0);
+        lifesaver.setAmount(lifesaver.getAmount() - 1);
 
         // set health to max
         player.setHealth(20);
