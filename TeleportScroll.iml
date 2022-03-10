@@ -10,10 +10,10 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18.2-R0.1-20220303.212005-6-shaded.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18-R0.1-20211210.131639-28-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/spigot-api-1.18.2-R0.1-20220303.212005-6-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES />
       </library>
@@ -21,7 +21,7 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/dependencies/item-nbt-api-plugin-2.9.0-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/dependencies/item-nbt-api-plugin-2.9.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

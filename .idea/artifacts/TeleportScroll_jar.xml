@@ -3,11 +3,11 @@
     <output-path>$PROJECT_DIR$/out/artifacts/jar</output-path>
     <root id="archive" name="TeleportScroll.jar">
       <element id="module-output" name="TeleportScroll" />
-      <element id="extracted-dir" path="$USER_HOME$/Downloads/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar" path-in-jar="/" />
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/plugin.yml" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/spigot-api-1.18-R0.1-20211210.131639-28-shaded.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
