@@ -135,11 +135,29 @@ public class ActivateTeleportScrollHandler {
         return player.getWorld().getName().equals(player.getBedSpawnLocation().getWorld().getName());
     }
 
+    private int getX(int x)
+    {
+        if (x < 0) {
+            return x - 1;
+        } else {
+            return x;
+        }
+    }
+
+    private int getZ(int z)
+    {
+        if (z < 0) {
+            return z - 1;
+        } else {
+            return z;
+        }
+    }
+
     private boolean alreadyThere(Location currentLocation, NBTItem nbtItem) {
         String currentWorld = currentLocation.getWorld().getName();
-        int currentX = ((int) currentLocation.getX() - 1);
+        int currentX = this.getX((int) currentLocation.getX());
         int currentY = ((int) Math.round(currentLocation.getY()));
-        int currentZ = ((int) currentLocation.getZ() - 1);
+        int currentZ = this.getZ((int) currentLocation.getZ());
 
         String world = nbtItem.getString("world");
         int x = nbtItem.getInteger("x");
@@ -159,9 +177,9 @@ public class ActivateTeleportScrollHandler {
         Location location = player.getLocation();
 
         String w = world.getName();
-        int x = ((int) location.getX()) - 1;
+        int x = this.getX((int) location.getX());
         int y = ((int) Math.round(location.getY()));
-        int z = ((int) location.getZ()) - 1;
+        int z = this.getZ((int) location.getZ());
         float yaw = this.getYaw(location);
 
         ItemStack teleportScroll;
