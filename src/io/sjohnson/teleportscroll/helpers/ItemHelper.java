@@ -1,6 +1,6 @@
 package io.sjohnson.teleportscroll.helpers;
 
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -21,6 +21,17 @@ public class ItemHelper
         NBTItem nbtItem = new NBTItem(item);
 
         return nbtItem.getBoolean("is_teleport_scroll");
+    }
+
+    public static boolean isTeleportBook(ItemStack item)
+    {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+
+        NBTItem nbtItem = new NBTItem(item);
+
+        return nbtItem.getBoolean("is_teleport_book");
     }
 
     public static boolean isBedTeleportScroll(ItemStack item)
@@ -59,9 +70,9 @@ public class ItemHelper
 
         int tier = nbtItem.getInteger("tier");
         String newDisplayName = switch (tier) {
-            case 2 -> ChatColor.YELLOW + name;
-            case 3 -> ChatColor.YELLOW + "" + ChatColor.BOLD + name;
-            default -> ChatColor.AQUA + name;
+            case 2 -> ChatColor.AQUA + "" + ChatColor.BOLD + name;
+            case 3 -> ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + name;
+            default -> ChatColor.YELLOW + "" + ChatColor.BOLD + name;
         };
 
         setItemName(item, newDisplayName);

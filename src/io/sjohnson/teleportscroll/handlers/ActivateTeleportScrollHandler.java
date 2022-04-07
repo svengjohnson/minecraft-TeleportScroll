@@ -1,6 +1,6 @@
 package io.sjohnson.teleportscroll.handlers;
 
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.CreateItem;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import io.sjohnson.teleportscroll.helpers.ParticleHelper;

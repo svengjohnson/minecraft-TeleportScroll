@@ -2,3 +2,5 @@ out/
 META-INF/
 scripts/
 src/io/sjohnson/teleportscroll/commands/Dev.java
+target/
+teleportscroll.iml
