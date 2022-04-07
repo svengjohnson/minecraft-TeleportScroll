@@ -21,6 +21,7 @@ public class Main extends JavaPlugin {
         this.getCommand("spawnscroll").setExecutor(new SpawnScroll());
         this.getCommand("lifesaver").setExecutor(new Lifesaver());
         this.getCommand("dev").setExecutor(new Dev());
+        this.getCommand("teleportbook").setExecutor(new TeleportBook());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package io.sjohnson.teleportscroll.commands;
 
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

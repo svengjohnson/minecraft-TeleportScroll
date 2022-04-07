@@ -161,4 +161,23 @@ public class CreateRecipe {
         Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
         return Recipe;
     }
+
+    public ShapedRecipe teleportBook() {
+        NamespacedKey key = new NamespacedKey(plugin, "teleportbook");
+
+        ItemStack teleportBook = CreateItem.createTeleportBook();
+
+        ShapedRecipe Recipe = new ShapedRecipe(key, teleportBook);
+        Recipe.shape(
+                "CEC",
+                "DBD",
+                "CEC"
+        );
+
+        Recipe.setIngredient('D', new RecipeChoice.ExactChoice(new ItemStack(Material.DIAMOND)));
+        Recipe.setIngredient('B', new RecipeChoice.ExactChoice(new ItemStack(Material.BOOK)));
+        Recipe.setIngredient('C', new RecipeChoice.ExactChoice(new ItemStack(Material.CHORUS_FRUIT)));
+        Recipe.setIngredient('E', new RecipeChoice.ExactChoice(new ItemStack(Material.ENDER_EYE)));
+        return Recipe;
+    }
 }
