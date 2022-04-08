@@ -5,14 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,7 +19,6 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class TeleportBookHelper {
     public static ComponentBuilder getBasePage()
@@ -117,32 +114,17 @@ public class TeleportBookHelper {
             page.append(this.createLink(i, teleportScroll).create());
             i++;
 
+            // Because first page can have only 11 rows, and subsequent ones can have 14
             if ((i - 10) - (13 * (pages - 1)) > 0) {
                 bookMeta.spigot().addPage(page.create());
                 pages++;
                 page = null;
             }
-
-//            if (i > 10 && pages == 1) {
-//                bookMeta.spigot().addPage(page.create());
-//                pages++;
-//                page = null;
-//            } else if ((i - 10) - (13 * (pages - 1)) > 0) {
-//                bookMeta.spigot().addPage(page.create());
-//                pages++;
-//                page = null;
-//            }
-
-            System.out.println((i - 10) - (13 * (pages - 1)));
         }
-
-        System.out.println(i);
 
         if (page != null) {
             bookMeta.spigot().addPage(page.create());
         }
-
-
 
         bookMeta.setTitle(player.getDisplayName() + "'s Teleport Book");
         bookMeta.setAuthor(player.getDisplayName());
@@ -155,7 +137,6 @@ public class TeleportBookHelper {
         nbtItem.setInteger("generation", 3);
         nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
         nbtItem.setString("json", JSON);
-
 
         return nbtItem.getItem();
     }
@@ -228,47 +209,15 @@ public class TeleportBookHelper {
         for (JsonElement teleportElement : jsonArray) {
             JsonObject teleport = teleportElement.getAsJsonObject();
             int index = teleport.get("id").getAsInt();
+            int tier = teleport.get("tier").getAsInt();
 
             if (index == id) {
-                teleportToDestination(player, teleport);
+                Location destination = TeleportHelper.getDestinationForTeleportBook(player, teleport);
+                if (TeleportHelper.canTeleport(player, destination, tier, true)) {
+                    TeleportHelper.teleport(player, destination, tier, false);
+                }
             }
         }
-
-    }
-
-    private void teleportToDestination(Player player, JsonObject teleport) throws InterruptedException {
-        String world = teleport.get("world").getAsString();
-        double x = teleport.get("x").getAsInt() + 0.5;
-        int y = teleport.get("y").getAsInt();
-        double z = teleport.get("z").getAsInt() + 0.5;
-        float yaw = teleport.get("yaw").getAsInt();
-
-
-        World tpWorld = Bukkit.getWorld(world);
-        Location location = new Location(tpWorld, x, y, z);
-        location.setYaw(yaw);
-
-        this.teleport(player,location);
-    }
-
-    private void teleport(Player player, Location location) throws InterruptedException {
-        //display particles
-        ParticleHelper.teleportParticles(player);
-
-        // play sound
-        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, (float) 0.5, 2);
-
-        // send message
-        player.sendMessage(ChatColor.AQUA + "Teleporting...");
-
-        // timeout for 1 second
-        TimeUnit.SECONDS.sleep(1);
-
-        // actually teleport
-        player.teleport(location);
-
-        // display particles at the destination
-        ParticleHelper.teleportParticles(player);
     }
 
     public String truncate(String value) {
