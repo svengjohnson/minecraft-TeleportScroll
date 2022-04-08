@@ -67,10 +67,10 @@ public class CreateItem {
         nbtItem.setBoolean("is_teleport_scroll", true);
         nbtItem.setInteger("tier", tier);
 
-//        if (tier == 3) {
-//            // prevent stacking
-//            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
-//        }
+        if (tier == 3) {
+            // prevent stacking
+            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
+        }
 
         return nbtItem.getItem();
     }
@@ -124,6 +124,21 @@ public class CreateItem {
         outputItem.setAmount(1);
 
         return outputItem;
+    }
+
+    public static ItemStack createCustomTeleportScroll(int count, int tier, String name, String world, int x, int y, int z, float yaw)
+    {
+        ItemStack baseScroll = createTeleportScroll(tier);
+        ItemStack outputScroll = createTeleportScrollWithCoords(baseScroll, world, x, y, z, yaw);
+
+        ItemMeta outputScrollMeta = outputScroll.getItemMeta();
+        assert outputScrollMeta != null;
+
+        outputScrollMeta.setDisplayName(name);
+        outputScroll.setItemMeta(outputScrollMeta);
+        outputScroll.setAmount(count);
+
+        return outputScroll;
     }
 
     public static ItemStack createBedTeleportScroll(int tier)
@@ -212,6 +227,7 @@ public class CreateItem {
 
         NBTItem nbtItem = new NBTItem(teleportBook);
         nbtItem.setBoolean("is_teleport_book", true);
+        nbtItem.setBoolean("empty_teleport_book", true);
         nbtItem.setInteger("generation", 3);
         // prevent stacking
         nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
