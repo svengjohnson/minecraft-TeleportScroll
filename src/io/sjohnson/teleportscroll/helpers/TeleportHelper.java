@@ -46,8 +46,12 @@ public class TeleportHelper {
         return targetLocation;
     }
 
-    public static Location getDestinationForTeleportBook(Player player, JsonObject teleport)
+    public static Location getDestinationForTeleportBook(Player player, JsonObject teleport, boolean toBed)
     {
+        if (toBed) {
+            return player.getBedSpawnLocation();
+        }
+
         String world = teleport.get("world").getAsString();
         double x = teleport.get("x").getAsInt() + 0.5;
         int y = teleport.get("y").getAsInt();

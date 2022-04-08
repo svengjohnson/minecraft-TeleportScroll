@@ -141,6 +141,20 @@ public class CreateItem {
         return outputScroll;
     }
 
+    public static ItemStack createCustomBedTeleportScroll(int count, int tier, String name)
+    {
+        ItemStack outputScroll = createBedTeleportScroll(tier);
+
+        ItemMeta outputScrollMeta = outputScroll.getItemMeta();
+        assert outputScrollMeta != null;
+
+        outputScrollMeta.setDisplayName(name);
+        outputScroll.setItemMeta(outputScrollMeta);
+        outputScroll.setAmount(count);
+
+        return outputScroll;
+    }
+
     public static ItemStack createBedTeleportScroll(int tier)
     {
         ItemStack bedScroll = createTeleportScroll(tier);

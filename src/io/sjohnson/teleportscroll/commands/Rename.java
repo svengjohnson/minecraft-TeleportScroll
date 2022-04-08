@@ -37,11 +37,6 @@ public class Rename implements CommandExecutor {
                 return true;
             }
 
-            if (ItemHelper.isBedTeleportScroll(itemStack)) {
-                player.sendMessage(ChatColor.RED + "This command cannot be used on Bed Teleport Scrolls");
-                return true;
-            }
-
             ItemHelper.renameTeleportScroll(itemStack, message);
             return true;
         }
