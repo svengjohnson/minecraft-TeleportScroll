@@ -18,33 +18,80 @@ import org.bukkit.inventory.meta.ItemMeta;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TeleportBookHelper {
     public static ComponentBuilder getBasePage()
     {
         return new ComponentBuilder()
-                .append(ChatColor.DARK_PURPLE + "[add scrolls]")
+                .append(ChatColor.DARK_PURPLE + "[add all scrolls]")
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook addScrolls"))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Adds all of the teleport scrolls from your inventory").create()))
                 .append("\n")
-                .append(ChatColor.DARK_PURPLE + "[remove scrolls]")
+                .append(ChatColor.DARK_PURPLE + "[remove all scrolls]")
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook removeScrolls"))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Removes all of the scrolls and puts them in your inventory").create()))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Removes all of the scrolls and puts them in your inventory\n(or on the ground, if you don't have room in your inventory").create()))
                 .append("\n")
                 .append("\n");
     }
 
     public void addTeleportScrolls(Player player, ItemStack teleportBook)
     {
-        ArrayList<ItemStack> allTeleports = getTeleportScrolls(player.getInventory());
-        String scrollJson = getTeleportScrollJSON(allTeleports);
-        ItemStack newBook = createBookWithAllTheTeleports(player, allTeleports, scrollJson);
+        ArrayList<ItemStack> inventoryScrolls = getInventoryScrolls(player.getInventory());
+        if (inventoryScrolls.size() == 0) {
+            player.sendMessage(ChatColor.YELLOW + "You do not have any teleport scrolls in your inventory");
+            return;
+        }
 
+        ArrayList<ItemStack> allTeleports = getExistingAndInventoryTeleportScrolls(teleportBook, inventoryScrolls);
+
+        if (allTeleports.size() > 100) {
+            player.sendMessage(ChatColor.YELLOW + "There's a maximum of 100 different teleports, perhaps you should make another book");
+            return;
+        }
+
+        String scrollJson = getTeleportScrollJSON(allTeleports);
+        ItemStack newBook = createBookWithAllTheTeleports(teleportBook, player, allTeleports, scrollJson);
+
+        player.getInventory().remove(teleportBook);
         player.getInventory().addItem(newBook);
     }
 
-    private ArrayList<ItemStack> getTeleportScrolls(Inventory inventory) {
+    private ArrayList<ItemStack> getExistingAndInventoryTeleportScrolls(ItemStack teleportBook, ArrayList<ItemStack> inventoryScrolls) {
+        ArrayList<ItemStack> teleportScrolls = new ArrayList<>();
+        ArrayList<JsonObject> existingScrolls = getAllExistingScrolls(teleportBook);
+
+        int count;
+        int tier;
+        String name;
+        String world;
+        int x;
+        int y;
+        int z;
+        float yaw;
+
+        // Exising scrolls, read in from JSON
+        for (JsonObject jsonScroll : existingScrolls) {
+            count = jsonScroll.get("count").getAsInt();
+            tier = jsonScroll.get("tier").getAsInt();
+            name = jsonScroll.get("name").getAsString();
+            world = jsonScroll.get("world").getAsString();
+            x = jsonScroll.get("x").getAsInt();
+            y = jsonScroll.get("y").getAsInt();
+            z = jsonScroll.get("z").getAsInt();
+            yaw = jsonScroll.get("yaw").getAsFloat();
+
+            teleportScrolls.add(CreateItem.createCustomTeleportScroll(count, tier, name, world, x ,y, z, yaw));
+        }
+
+        teleportScrolls.addAll(inventoryScrolls);
+
+        return teleportScrolls;
+    }
+
+    private ArrayList<ItemStack> getInventoryScrolls(Inventory inventory)
+    {
         ArrayList<ItemStack> teleportScrolls = new ArrayList<>();
 
         for (ItemStack item : inventory.getContents()) {
@@ -64,6 +111,7 @@ public class TeleportBookHelper {
         int i = 0;
         JsonArrayBuilder teleportScrollBuilder = Json.createArrayBuilder();
 
+        // New ones, read in from inventory
         for (ItemStack teleportScroll : teleportScrolls) {
             NBTItem nbtScroll = new NBTItem(teleportScroll);
             ItemMeta scrollMeta = teleportScroll.getItemMeta();
@@ -87,10 +135,16 @@ public class TeleportBookHelper {
         return teleportScrollBuilder.build().toString();
     }
 
-    private ItemStack createBookWithAllTheTeleports(Player player, ArrayList<ItemStack> teleportScrolls, String JSON)
+    private ItemStack createBookWithAllTheTeleports(ItemStack originalBook, Player player, ArrayList<ItemStack> teleportScrolls, String JSON)
     {
         ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
-        ItemHelper.setItemName(teleportBook, ChatColor.GOLD + "" + ChatColor.BOLD + "Teleport Book");
+        NBTItem originalNBT = new NBTItem(originalBook);
+
+        if (originalNBT.getBoolean("empty_teleport_book")) {
+            ItemHelper.setItemName(teleportBook, ChatColor.GOLD + "" + ChatColor.BOLD + "Teleport Book");
+        } else {
+            ItemHelper.setItemName(teleportBook, Objects.requireNonNull(originalBook.getItemMeta()).getDisplayName());
+        }
 
         ItemMeta Meta = teleportBook.getItemMeta();
         assert Meta != null;
@@ -111,7 +165,7 @@ public class TeleportBookHelper {
             }
 
 
-            page.append(this.createLink(i, teleportScroll).create());
+            page.append(this.createLinkFromItemStack(i, teleportScroll).create());
             i++;
 
             // Because first page can have only 11 rows, and subsequent ones can have 14
@@ -134,6 +188,7 @@ public class TeleportBookHelper {
 
         NBTItem nbtItem = new NBTItem(teleportBook);
         nbtItem.setBoolean("is_teleport_book", true);
+        nbtItem.setBoolean("empty_teleport_book", false);
         nbtItem.setInteger("generation", 3);
         nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
         nbtItem.setString("json", JSON);
@@ -141,17 +196,9 @@ public class TeleportBookHelper {
         return nbtItem.getItem();
     }
 
-    private ComponentBuilder createLink(int id, ItemStack itemStack)
+    private ComponentBuilder createLinkFromData(int id, int count, int tier, String world, int x, int y, int z, float yaw, String originalDisplayName)
     {
-        NBTItem nbtItem = new NBTItem(itemStack);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        assert itemMeta != null;
-
-        String fullDN = itemMeta.getDisplayName();
-        String displayName = truncate(ChatColor.stripColor(fullDN));
-
-        int tier = nbtItem.getInteger("tier");
-        int count = itemStack.getAmount();
+        String displayName = truncate(ChatColor.stripColor(originalDisplayName), tier);
 
         String name = switch (tier) {
             case 2 -> ChatColor.BLUE + "" + displayName + " (" + count + ")";
@@ -161,11 +208,6 @@ public class TeleportBookHelper {
 
         String direction;
         String tierName;
-        String world = nbtItem.getString("world");
-        int x = nbtItem.getInteger("x");
-        int y = nbtItem.getInteger("y");
-        int z = nbtItem.getInteger("z");
-        float yaw = nbtItem.getFloat("yaw");
 
         if (yaw == 180) {
             direction = "N";
@@ -189,13 +231,52 @@ public class TeleportBookHelper {
             }
         }
 
-        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", fullDN, tierName, world, x, y, z, direction);
+        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", originalDisplayName, tierName, world, x, y, z, direction);
 
         return new ComponentBuilder()
                 .append(name)
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook teleportTo " + id))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(altText).create()))
                 .append("\n");
+    }
+
+    private ComponentBuilder createLinkFromItemStack(int id, ItemStack itemStack)
+    {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        assert itemMeta != null;
+
+        int count = itemStack.getAmount();
+        int tier = nbtItem.getInteger("tier");
+        String world = nbtItem.getString("world");
+        int x = nbtItem.getInteger("x");
+        int y = nbtItem.getInteger("y");
+        int z = nbtItem.getInteger("z");
+        float yaw = nbtItem.getFloat("yaw");
+        String displayName = itemMeta.getDisplayName();
+
+        return createLinkFromData(id, count, tier, world, x, y, z, yaw, displayName);
+    }
+
+    public ArrayList<JsonObject> getAllExistingScrolls(ItemStack teleportBook)
+    {
+        ArrayList<JsonObject> existingScrolls = new ArrayList<>();
+        NBTItem nbtTeleportBook = new NBTItem(teleportBook);
+
+        if(!nbtTeleportBook.hasKey("json")) {
+            return existingScrolls;
+        }
+
+        String teleportJson = nbtTeleportBook.getString("json");
+
+        JsonArray jsonArray = new JsonParser().parse(teleportJson).getAsJsonArray();
+
+        for (JsonElement teleportElement : jsonArray) {
+            JsonObject teleport = teleportElement.getAsJsonObject();
+            existingScrolls.add(teleport);
+        }
+
+        return existingScrolls;
     }
 
     public void teleportTo(Player player, ItemStack teleportBook, String teleportIdx) throws InterruptedException {
@@ -220,9 +301,17 @@ public class TeleportBookHelper {
         }
     }
 
-    public String truncate(String value) {
-        if (value.length() > 15) {
-            return value.substring(0, 13) + "...";
+    public String truncate(String value, int tier) {
+        int maxlength;
+
+        if (tier == 3){
+            maxlength = 19;
+        } else {
+            maxlength = 15;
+        }
+
+        if (value.length() > maxlength) {
+            return value.substring(0, maxlength-2) + "...";
         } else {
             return value;
         }
