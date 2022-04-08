@@ -69,7 +69,7 @@ public class ItemHelper
         NBTItem nbtItem = new NBTItem(item);
         String newDisplayName;
 
-        if (nbtItem.hasKey("x")) {
+        if (isTeleportScroll(item)) {
             int tier = nbtItem.getInteger("tier");
             newDisplayName = switch (tier) {
                 case 2 -> ChatColor.AQUA + name;
