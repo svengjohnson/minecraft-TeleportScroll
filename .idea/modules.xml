@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/teleportscroll.iml" filepath="$PROJECT_DIR$/teleportscroll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/TeleportScroll.iml" filepath="$PROJECT_DIR$/TeleportScroll.iml" />
     </modules>
   </component>
 </project>

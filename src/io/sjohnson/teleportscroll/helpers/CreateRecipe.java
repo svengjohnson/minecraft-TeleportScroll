@@ -27,6 +27,7 @@ public class CreateRecipe {
         this.server.addRecipe(this.bedScrollT2());
         this.server.addRecipe(this.bedScrollT3());
         this.server.addRecipe(this.lifesaver());
+        this.server.addRecipe(this.teleportBook());
     }
 
     public ShapedRecipe teleportScroll() {
