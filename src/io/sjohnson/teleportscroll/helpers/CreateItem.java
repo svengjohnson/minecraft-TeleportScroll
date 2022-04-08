@@ -1,15 +1,14 @@
 package io.sjohnson.teleportscroll.helpers;
 
-import de.tr7zw.changeme.nbtapi.NBTContainer;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import de.tr7zw.changeme.nbtapi.*;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import javax.json.*;
-
 import java.util.UUID;
 
 public class CreateItem {
@@ -98,15 +97,15 @@ public class CreateItem {
 
         switch (tier) {
             case 2 -> {
-                name = ChatColor.AQUA + "" + ChatColor.BOLD + "Enhanced Teleport Scroll";
+                name = ChatColor.AQUA + "Enhanced Teleport Scroll";
                 customModel = 10005;
             }
             case 3 -> {
-                name = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Eternal Teleport Scroll";
+                name = ChatColor.LIGHT_PURPLE + "Eternal Teleport Scroll";
                 customModel = 10006;
             }
             default -> {
-                name = ChatColor.YELLOW + "" + ChatColor.BOLD + "Teleport Scroll";
+                name = ChatColor.YELLOW + "Teleport Scroll";
                 customModel = 10004;
             }
         }
@@ -135,15 +134,15 @@ public class CreateItem {
 
         switch (tier) {
             case 2 -> {
-                name = ChatColor.AQUA + "" + ChatColor.BOLD + "Enhanced Bed Teleport Scroll";
+                name = ChatColor.AQUA + "Enhanced Bed Teleport Scroll";
                 customModel = 10005;
             }
             case 3 -> {
-                name = ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Eternal Bed Teleport Scroll";
+                name = ChatColor.LIGHT_PURPLE + "Eternal Bed Teleport Scroll";
                 customModel = 10006;
             }
             default -> {
-                name = ChatColor.YELLOW + "" + ChatColor.BOLD + "Bed Teleport Scroll";
+                name = ChatColor.YELLOW + "Bed Teleport Scroll";
                 customModel = 10004;
             }
         }
@@ -181,20 +180,19 @@ public class CreateItem {
         NBTItem nbtItem = new NBTItem(lifesaver);
         nbtItem.setBoolean("is_lifesaver", true);
         // prevent stacking
-        // nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString());
+        nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString());
         return nbtItem.getItem();
     }
 
     public static ItemStack createTeleportBook()
     {
         ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
-        ItemHelper.setItemName(teleportBook, ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Teleport Book");
+        ItemHelper.setItemName(teleportBook, ChatColor.LIGHT_PURPLE + "Empty Teleport Book");
 
         ItemMeta Meta = teleportBook.getItemMeta();
         assert Meta != null;
 
         Meta.addItemFlags(
-                ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_PLACED_ON,
@@ -202,43 +200,22 @@ public class CreateItem {
         );
         teleportBook.setItemMeta(Meta);
 
+        BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
+
+        BaseComponent[] basePage = TeleportBookHelper.getBasePage().create();
+
+        bookMeta.spigot().addPage(basePage);
+        bookMeta.setTitle("Teleport Book");
+        bookMeta.setAuthor("");
+        teleportBook.setItemMeta(bookMeta);
+
+
         NBTItem nbtItem = new NBTItem(teleportBook);
         nbtItem.setBoolean("is_teleport_book", true);
         nbtItem.setInteger("generation", 3);
         // prevent stacking
         nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
 
-        JsonArray pages = Json.createArrayBuilder()
-                .add(Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder()
-                                .add("text", "[add teleport scrolls")
-                                .add("color", "dark_purple")
-                                .add("clickEvent", Json.createObjectBuilder()
-                                        .add("action", "run_command")
-                                        .add("value", "/teleportbook addScrolls")
-                                )
-                                .add("hoverEvent", Json.createObjectBuilder()
-                                        .add("action", "show_text")
-                                        .add("content", "click this to add all scrolls from your inventory to this book")
-                                )
-                        )
-                        .add(Json.createObjectBuilder()
-                                .add("text", "[delete teleport scrolls")
-                                .add("color", "dark_purple")
-                                .add("clickEvent", Json.createObjectBuilder()
-                                        .add("action", "run_command")
-                                        .add("value", "/teleportbook deleteScrolls")
-                                )
-                                .add("hoverEvent", Json.createObjectBuilder()
-                                        .add("action", "show_text")
-                                        .add("content", "removes all the scrolls from this book and puts them in your inventory")
-                                )
-                        )
-                ).build();
-
-        nbtItem.setObject("pages", pages);
-        //nbtItem.setObject("pages", new NBTContainer(":['{\"text\":\" [add teleport scrolls]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/teleportbook addScrolls\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":\"click this to add all teleport scrolls from your inventory to this book\"}}']"));
-        //nbtItem.mergeCompound(new NBTContainer("{pages:['{\"text\":\" [add teleport scrolls]\",\"color\":\"dark_purple\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"/teleportbook addScrolls\"},\"hoverEvent\":{\"action\":\"show_text\",\"value\":\"click this to add all teleport scrolls from your inventory to this book\"}}']}"));
         return nbtItem.getItem();
     }
 }

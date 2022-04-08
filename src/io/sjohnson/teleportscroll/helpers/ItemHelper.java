@@ -62,18 +62,23 @@ public class ItemHelper
 
     public static void renameTeleportScroll(ItemStack item, String name)
     {
-        if (!isTeleportScroll(item)) {
+        if (!isTeleportScroll(item) && !isTeleportBook(item)) {
             return;
         }
 
         NBTItem nbtItem = new NBTItem(item);
+        String newDisplayName;
 
-        int tier = nbtItem.getInteger("tier");
-        String newDisplayName = switch (tier) {
-            case 2 -> ChatColor.AQUA + "" + ChatColor.BOLD + name;
-            case 3 -> ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + name;
-            default -> ChatColor.YELLOW + "" + ChatColor.BOLD + name;
-        };
+        if (nbtItem.hasKey("x")) {
+            int tier = nbtItem.getInteger("tier");
+            newDisplayName = switch (tier) {
+                case 2 -> ChatColor.AQUA + name;
+                case 3 -> ChatColor.LIGHT_PURPLE + name;
+                default -> ChatColor.YELLOW + name;
+            };
+        } else {
+            newDisplayName = ChatColor.GOLD + "" + ChatColor.BOLD + name;
+        }
 
         setItemName(item, newDisplayName);
     }

@@ -32,8 +32,8 @@ public class Rename implements CommandExecutor {
 
             message = joinedArgs.substring(1);
 
-            if (!ItemHelper.isTeleportScroll(itemStack)) {
-                player.sendMessage(ChatColor.RED + "This command can only be used on Teleport Scrolls");
+            if (!ItemHelper.isTeleportScroll(itemStack) && !ItemHelper.isTeleportBook(itemStack)) {
+                player.sendMessage(ChatColor.RED + "This command can only be used on Teleport Scrolls or Teleport Books");
                 return true;
             }
 
