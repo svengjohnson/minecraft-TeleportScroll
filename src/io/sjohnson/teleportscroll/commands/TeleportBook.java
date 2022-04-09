@@ -2,6 +2,7 @@ package io.sjohnson.teleportscroll.commands;
 
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import io.sjohnson.teleportscroll.helpers.TeleportBookHelper;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,17 @@ public class TeleportBook implements CommandExecutor {
             }
 
             ItemStack mainHand = player.getInventory().getItemInMainHand();
-            if (!ItemHelper.isTeleportBook(mainHand)) {
+            ItemStack offHand = player.getInventory().getItemInOffHand();
+            ItemStack teleportBook;
+            int slot;
+
+            if (ItemHelper.isTeleportBook(mainHand)) {
+                teleportBook = mainHand;
+                slot = 0;
+            } else if (ItemHelper.isTeleportBook(offHand)) {
+                teleportBook = offHand;
+                slot = 1;
+            } else {
                 return true;
             }
 
@@ -26,20 +37,19 @@ public class TeleportBook implements CommandExecutor {
 
             switch (subcommand) {
                 case "addScrolls":
-                    teleportBookHelper.addTeleportScrolls(player, mainHand);
+                    teleportBookHelper.addTeleportScrolls(player, teleportBook, slot);
                     break;
                 case "removeScrolls":
-                    player.sendMessage("not implemented yet");
+                    teleportBookHelper.removeTeleportScrolls(player, teleportBook, slot);
                     break;
                 case "teleportTo":
                     try {
-                        teleportBookHelper.teleportTo(player, mainHand, args[1]);
+                        teleportBookHelper.teleportTo(player, teleportBook, args[1], slot);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     break;
                 default:
-                    player.sendMessage("es pisu tavu fateri");
             }
 
         }
