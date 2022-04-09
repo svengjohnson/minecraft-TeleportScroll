@@ -49,7 +49,7 @@ public class ItemHelper
         return nbtItem.getBoolean("teleport_to_bed");
     }
 
-    public static boolean isBlankTeleportScroll(ItemStack item)
+    public static boolean isCoordinateTeleportScroll(ItemStack item)
     {
         if (item == null || item.getType() == Material.AIR) {
             return false;
@@ -61,7 +61,7 @@ public class ItemHelper
 
         NBTItem nbtItem = new NBTItem(item);
 
-        return !nbtItem.hasKey("x");
+        return nbtItem.hasKey("x");
     }
 
     public static boolean isLifesaver(ItemStack item)
@@ -145,5 +145,48 @@ public class ItemHelper
         }
 
         return i;
+    }
+
+    public static String getBedTeleportScrollName(int tier)
+    {
+        switch (tier) {
+            case 2 -> {
+                return ChatColor.AQUA + "Enhanced Bed Teleport Scroll";
+            }
+            case 3 -> {
+                return ChatColor.LIGHT_PURPLE + "Eternal Bed Teleport Scroll";
+            }
+            default -> {
+                return ChatColor.YELLOW + "Bed Teleport Scroll";
+            }
+        }
+    }
+
+    public static String getDefaultTeleportScrollName(int tier)
+    {
+        switch (tier) {
+            case 2 -> {
+                return ChatColor.AQUA + "Enhanced Teleport Scroll";
+            }
+            case 3 -> {
+                return ChatColor.LIGHT_PURPLE + "Eternal Teleport Scroll";
+            }
+            default -> {
+                return ChatColor.YELLOW + "Teleport Scroll";
+            }
+        }
+    }
+
+    public static String getCardinalDirection(int yaw)
+    {
+        if (yaw == 180) {
+            return "N";
+        } else if (yaw == -90) {
+            return "E";
+        } else if (yaw == 90) {
+            return "W";
+        } else {
+            return "S";
+        }
     }
 }
