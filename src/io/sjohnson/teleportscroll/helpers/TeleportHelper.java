@@ -116,7 +116,6 @@ public class TeleportHelper {
 
     private static boolean sameWorld(Player player, Location targetLocation)
     {
-        System.out.println(player.getWorld().getName() + " " + targetLocation.getWorld().getName());
         return player.getWorld().getName().equals(targetLocation.getWorld().getName());
     }
 

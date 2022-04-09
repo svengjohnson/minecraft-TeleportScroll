@@ -49,6 +49,21 @@ public class ItemHelper
         return nbtItem.getBoolean("teleport_to_bed");
     }
 
+    public static boolean isBlankTeleportScroll(ItemStack item)
+    {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+
+        if (!isTeleportScroll(item)) {
+            return false;
+        }
+
+        NBTItem nbtItem = new NBTItem(item);
+
+        return !nbtItem.hasKey("x");
+    }
+
     public static boolean isLifesaver(ItemStack item)
     {
         if (item == null || item.getType() == Material.AIR) {
