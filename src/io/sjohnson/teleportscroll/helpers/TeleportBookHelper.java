@@ -88,11 +88,43 @@ public class TeleportBookHelper {
         float yaw;
 
         // Then come the exising scrolls, read in from JSON
-        for (JsonObject jsonScroll : existingScrolls) {
+        teleportScrolls.addAll(getExistingScrolls(teleportBook, false, 0));
+
+        // Finally, add the new inventory scrolls.
+        teleportScrolls.addAll(inventoryScrolls);
+
+        return teleportScrolls;
+    }
+
+    private ArrayList<ItemStack> getExistingScrolls(ItemStack teleportBook, boolean consumeScroll, int consumeIndex)
+    {
+        ArrayList<ItemStack> teleportScrolls = new ArrayList<>();
+
+        int id;
+        boolean bed;
+        int count;
+        int tier;
+        String name;
+        String world;
+        int x;
+        int y;
+        int z;
+        float yaw;
+
+        for (JsonObject jsonScroll : getAllExistingScrolls(teleportBook)) {
+            id = jsonScroll.get("id").getAsInt();
             bed = jsonScroll.get("teleport_to_bed").getAsBoolean();
             count = jsonScroll.get("count").getAsInt();
             tier = jsonScroll.get("tier").getAsInt();
             name = jsonScroll.get("name").getAsString();
+
+            if (consumeScroll && id == consumeIndex && tier < 3) {
+                count = count - 1;
+
+                if (count < 1) {
+                    continue;
+                }
+            }
 
             if (bed) {
                 teleportScrolls.add(CreateItem.createCustomBedTeleportScroll(count, tier, name));
@@ -105,11 +137,7 @@ public class TeleportBookHelper {
 
                 teleportScrolls.add(CreateItem.createCustomTeleportScroll(count, tier, name, world, x, y, z, yaw));
             }
-
         }
-
-        // Finally, add the new inventory scrolls.
-        teleportScrolls.addAll(inventoryScrolls);
 
         return teleportScrolls;
     }
@@ -198,8 +226,10 @@ public class TeleportBookHelper {
 
         int pages = 1;
         int i = 0;
+        int totalCount = 0;
 
         for (ItemStack teleportScroll : teleportScrolls) {
+            totalCount += teleportScroll.getAmount();
             if (page == null) {
                 if (pages == 1) {
                     page = TeleportBookHelper.getBasePage();
@@ -227,7 +257,7 @@ public class TeleportBookHelper {
         bookMeta.setAuthor(player.getDisplayName());
         teleportBook.setItemMeta(bookMeta);
 
-        ItemHelper.setItemLore(teleportBook, ChatColor.GOLD + "Contains " + i + " different teleport scrolls");
+        ItemHelper.setItemLore(teleportBook, ChatColor.GOLD + "Contains " + i + " unique teleport scroll(s);Total teleport scrolls: " + totalCount);
 
         NBTItem nbtItem = new NBTItem(teleportBook);
         nbtItem.setBoolean("is_teleport_book", true);
@@ -388,48 +418,7 @@ public class TeleportBookHelper {
 
     public void consumeTeleport(Player player, ItemStack oldBook, int indexToConsume)
     {
-        ArrayList<ItemStack> newScrolls = new ArrayList<>();
-
-        int id;
-
-        boolean bed;
-        int count;
-        int tier;
-        String name;
-        String world;
-        int x;
-        int y;
-        int z;
-        float yaw;
-
-        for (JsonObject jsonScroll : getAllExistingScrolls(oldBook)) {
-            id = jsonScroll.get("id").getAsInt();
-            bed = jsonScroll.get("teleport_to_bed").getAsBoolean();
-            count = jsonScroll.get("count").getAsInt();
-            tier = jsonScroll.get("tier").getAsInt();
-            name = jsonScroll.get("name").getAsString();
-
-            if (id == indexToConsume && tier < 3) {
-                count = count - 1;
-
-                if (count < 1) {
-                    continue;
-                }
-            }
-
-            if (bed) {
-                newScrolls.add(CreateItem.createCustomBedTeleportScroll(count, tier, name));
-            } else {
-                world = jsonScroll.get("world").getAsString();
-                x = jsonScroll.get("x").getAsInt();
-                y = jsonScroll.get("y").getAsInt();
-                z = jsonScroll.get("z").getAsInt();
-                yaw = jsonScroll.get("yaw").getAsFloat();
-
-                newScrolls.add(CreateItem.createCustomTeleportScroll(count, tier, name, world, x, y, z, yaw));
-            }
-        }
-
+        ArrayList<ItemStack> newScrolls = getExistingScrolls(oldBook, true, indexToConsume);
 
         if (newScrolls.size() > 0) {
             String scrollJson = getTeleportScrollJSON(newScrolls);
