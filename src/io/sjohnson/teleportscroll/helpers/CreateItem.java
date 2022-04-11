@@ -14,35 +14,24 @@ import java.util.UUID;
 public class CreateItem {
     public static ItemStack createTeleportScroll(int tier)
     {
-        Material material;
-
-        String name;
-        String displayName;
+        Material material = Material.PAPER;
+        String displayName = ItemHelper.getDefaultBlankTeleportScrollName(tier);
         String lore;
         int customModel;
 
         switch (tier) {
             case 3 -> {
-                material = Material.PAPER;
-                name = "Blank Eternal Teleport Scroll";
-                displayName = ChatColor.LIGHT_PURPLE + name;
                 customModel = 10003;
             }
             case 2 -> {
-                material = Material.PAPER;
-                name = "Blank Enhanced Teleport Scroll";
-                displayName = ChatColor.AQUA + name;
                 customModel = 10002;
             }
             default -> {
-                material = Material.PAPER;
-                name = "Blank Teleport Scroll";
-                displayName = ChatColor.YELLOW + name;
                 customModel = 10001;
             }
         }
 
-        lore = ChatColor.DARK_GREEN + name;
+        lore = displayName;
 
         ItemStack item = new ItemStack(material);
         ItemHelper.setItemName(item, displayName);
@@ -81,7 +70,7 @@ public class CreateItem {
         NBTItem nbtItem = new NBTItem(item.clone());
 
         int tier = nbtItem.getInteger("tier");
-        String name;
+        String name = ItemHelper.getDefaultTeleportScrollName(tier);
         String direction;
         int customModel;
 
@@ -97,15 +86,12 @@ public class CreateItem {
 
         switch (tier) {
             case 2 -> {
-                name = ChatColor.AQUA + "Enhanced Teleport Scroll";
                 customModel = 10005;
             }
             case 3 -> {
-                name = ChatColor.LIGHT_PURPLE + "Eternal Teleport Scroll";
                 customModel = 10006;
             }
             default -> {
-                name = ChatColor.YELLOW + "Teleport Scroll";
                 customModel = 10004;
             }
         }
@@ -158,21 +144,18 @@ public class CreateItem {
     public static ItemStack createBedTeleportScroll(int tier)
     {
         ItemStack bedScroll = createTeleportScroll(tier);
-        String name;
+        String name = ItemHelper.getBedTeleportScrollName(tier);
         int customModel;
 
         switch (tier) {
             case 2 -> {
-                name = ChatColor.AQUA + "Enhanced Bed Teleport Scroll";
-                customModel = 10005;
+                customModel = 10008;
             }
             case 3 -> {
-                name = ChatColor.LIGHT_PURPLE + "Eternal Bed Teleport Scroll";
-                customModel = 10006;
+                customModel = 10009;
             }
             default -> {
-                name = ChatColor.YELLOW + "Bed Teleport Scroll";
-                customModel = 10004;
+                customModel = 10007;
             }
         }
 
@@ -213,10 +196,11 @@ public class CreateItem {
         return nbtItem.getItem();
     }
 
-    public static ItemStack createTeleportBook()
+    public static ItemStack createEmptyTeleportBook()
     {
         ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
         ItemHelper.setItemName(teleportBook, ChatColor.LIGHT_PURPLE + "Empty Teleport Book");
+        ItemHelper.setCustomModel(teleportBook, 10012);
 
         ItemMeta Meta = teleportBook.getItemMeta();
         assert Meta != null;

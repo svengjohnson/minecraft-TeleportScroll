@@ -9,6 +9,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 public class EndermanDeathHandler {
@@ -28,103 +29,104 @@ public class EndermanDeathHandler {
     private ItemStack rollRandomDrop(Location location)
     {
         int min = 0;
-        int max = 1000;
-
-        int radius = 5000;
-
-        int x;
-        int y = 128;
-        int z;
-
-        int tp_x;
-        int tp_y;
-        int tp_z;
-
-        int roll = (int)(Math.random()*(max-min+1)+min);
-
-        boolean is_the_end = location.getWorld().getName().equals("world_the_end");
+        int max = 999;
+        int structureAttempts = 1;
 
         ItemStack drop;
 
-        int blank_scroll_req;
+        int roll = (int)(Math.random()*(max-min+1)+min);
+        boolean is_the_end = Objects.requireNonNull(location.getWorld()).getName().equals("world_the_end");
+        int blank_scroll_req, blank_scroll_req_t2, structure_scroll_req;
 
         if (is_the_end) {
             blank_scroll_req = 20;
+            blank_scroll_req_t2 = 30;
+            structure_scroll_req = 35;
         } else {
             blank_scroll_req = 200;
+            blank_scroll_req_t2 = 300;
+            structure_scroll_req = 350;
         }
 
-        // 20% chance on getting a 2x blank tier 1 scroll as a drop, 2% in the end
+
+        // 20% chance on getting a 8x blank tier 1 scroll as a drop, 2% in the end
         if (roll < blank_scroll_req) {
             drop = CreateItem.createTeleportScroll(1);
-            drop.setAmount(2);
+            drop.setAmount(8);
             return drop;
         }
 
-        int structure_scroll_req;
-
-        if (is_the_end) {
-            structure_scroll_req = 25;
-        } else {
-            structure_scroll_req = 250;
+        // 10% chance on getting a 8x blank tier 2 scroll as a drop, 1% in the end
+        if (roll < blank_scroll_req_t2) {
+            drop = CreateItem.createTeleportScroll(2);
+            drop.setAmount(8);
+            return drop;
         }
 
         // 5% chance on rolling a Structure Teleport Scroll, 0.5% in the end
         if (roll < structure_scroll_req) {
-            String worldName = this.getRandomWorld();
-            StructureType structure = this.getRandomStructure(worldName);
-            World world = Bukkit.getWorld(worldName);
+            ItemStack structureTeleportScroll;
 
-            x = getRandomX(location);
-            z = getRandomZ(location);
-
-            Location searchLocation = new Location(world, x, y, z);
-            assert world != null;
-            Location foundStructure = world.locateNearestStructure(searchLocation, structure, radius, true);
-
-            if (foundStructure == null) {
-                return null;
+            for (int i = 0; i < structureAttempts; i++) {
+                structureTeleportScroll = generateStructureTeleportScroll(location);
+                if (structureTeleportScroll != null) {
+                    return structureTeleportScroll;
+                }
             }
 
-            tp_x = (int) foundStructure.getX();
-            tp_z = (int) foundStructure.getZ();
-
-            if (worldName.equals("world_nether")) {
-                tp_y = findSafeNetherCoordinate(world, tp_x, tp_z);
-            } else {
-                tp_y = world.getHighestBlockYAt(tp_x, tp_z) + 1;
-            }
-
-            if (tp_y == 0) {
-                // if no safe location was found, drop a tier 3 teleport scroll
-                return CreateItem.createTeleportScroll(3);
-            }
-
-            String name = this.getStructureName(structure) + " Teleport Scroll";
-            int tier = (int)(Math.random()*(2-1+1)+1);
-
-            ItemStack blankScroll = CreateItem.createTeleportScroll(tier);
-            ItemStack teleportScroll = CreateItem.createTeleportScrollWithCoords(blankScroll, world.getName(), tp_x, tp_y, tp_z, 0);
-            ItemHelper.renameTeleportScroll(teleportScroll, name);
-
-            return teleportScroll;
-        }
-
-
-        int pearl_req;
-
-        if (is_the_end) {
-            pearl_req = 0;
-        } else {
-            pearl_req = 1000;
-        }
-
-        // otherwise always drop a pearl, except in the end
-        if (roll < pearl_req) {
-            return new ItemStack(Material.ENDER_PEARL);
+            // drop 2x blank tier 3 scrolls if we failed to find a structure or a safe location
+            drop = CreateItem.createTeleportScroll(3);
+            drop.setAmount(2);
+            return drop;
         }
 
         return null;
+    }
+
+    private ItemStack generateStructureTeleportScroll(Location location)
+    {
+        int x, z, tp_x, tp_y, tp_z;
+        int y = 128;
+        int radius = 5000;
+
+        String worldName = this.getRandomWorld();
+        StructureType structure = this.getRandomStructure(worldName);
+        World world = Bukkit.getWorld(worldName);
+
+        x = getRandomX(location);
+        z = getRandomZ(location);
+
+        Location searchLocation = new Location(world, x, y, z);
+        assert world != null;
+
+        Location foundStructure = world.locateNearestStructure(searchLocation, structure, radius, true);
+
+        if (foundStructure == null) {
+            return null;
+        }
+
+        tp_x = (int) foundStructure.getX();
+        tp_z = (int) foundStructure.getZ();
+
+        if (worldName.equals("world_nether")) {
+            tp_y = findSafeNetherCoordinate(world, tp_x, tp_z);
+        } else {
+            tp_y = world.getHighestBlockYAt(tp_x, tp_z) + 1;
+        }
+
+        if (tp_y == 0) {
+            // no safe location found
+            return null;
+        }
+
+        String name = this.getStructureName(structure) + " Teleport Scroll";
+
+        ItemStack blankScroll = CreateItem.createTeleportScroll(2);
+        ItemStack teleportScroll = CreateItem.createTeleportScrollWithCoords(blankScroll, world.getName(), tp_x, tp_y, tp_z, 0);
+        ItemHelper.setCustomModel(teleportScroll, 100010);
+        ItemHelper.renameTeleportScroll(teleportScroll, name);
+
+        return teleportScroll;
     }
 
     private int findSafeNetherCoordinate(World world, int x, int z)
@@ -133,10 +135,8 @@ public class EndermanDeathHandler {
 
         for (y = 1; y < 126; y++) {
             if (this.isSafeLocation(new Location(world, x, y, z))) {
-                //System.out.println("x " + x + " y " + y + " z " + z + " SAFE!");
                 return y;
             }
-            //System.out.println("x " + x + " y " + y + " z " + z + " NOT SAFE");
         }
 
         return 0;
@@ -149,22 +149,18 @@ public class EndermanDeathHandler {
         Block ground = feet.getRelative(BlockFace.DOWN);
 
         if (head.getType() != Material.AIR) {
-            //System.out.println("HEAD NOT AIR");
             return false;
         }
 
         if (feet.getType() != Material.AIR) {
-            //System.out.println("FEET NOT AIR");
             return false;
         }
 
         if (ground.getType() == Material.LAVA) {
-            //System.out.println("GROUND LAVA");
             return false;
         }
 
         if (ground.getType() == Material.AIR) {
-            //System.out.println("GROUND AIR");
             return false;
         }
 
@@ -290,7 +286,6 @@ public class EndermanDeathHandler {
     private StructureType getRandomStructure(String world)
     {
         ArrayList<StructureType> overworld = new ArrayList<>();
-        //overworld.add(StructureType.MINESHAFT);
         overworld.add(StructureType.VILLAGE);
         overworld.add(StructureType.STRONGHOLD);
         overworld.add(StructureType.JUNGLE_PYRAMID);
@@ -300,7 +295,6 @@ public class EndermanDeathHandler {
         overworld.add(StructureType.SWAMP_HUT);
         overworld.add(StructureType.OCEAN_MONUMENT);
         overworld.add(StructureType.WOODLAND_MANSION);
-        //overworld.add(StructureType.BURIED_TREASURE);
         overworld.add(StructureType.SHIPWRECK);
         overworld.add(StructureType.PILLAGER_OUTPOST);
         overworld.add(StructureType.RUINED_PORTAL);
