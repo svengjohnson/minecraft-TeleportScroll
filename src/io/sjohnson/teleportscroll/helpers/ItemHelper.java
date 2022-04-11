@@ -2,7 +2,10 @@ package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -177,6 +180,21 @@ public class ItemHelper
         }
     }
 
+    public static String getDefaultBlankTeleportScrollName(int tier)
+    {
+        switch (tier) {
+            case 2 -> {
+                return ChatColor.AQUA + "Blank Enhanced Teleport Scroll";
+            }
+            case 3 -> {
+                return ChatColor.LIGHT_PURPLE + "Blank Eternal Teleport Scroll";
+            }
+            default -> {
+                return ChatColor.YELLOW + "Blank Teleport Scroll";
+            }
+        }
+    }
+
     public static String getCardinalDirection(int yaw)
     {
         if (yaw == 180) {
@@ -188,5 +206,14 @@ public class ItemHelper
         } else {
             return "S";
         }
+    }
+
+    public static void dropItem(Player player, ItemStack itemStack)
+    {
+        Location location = player.getLocation();
+        World world = location.getWorld();
+
+        assert world != null;
+        world.dropItem(location, itemStack);
     }
 }

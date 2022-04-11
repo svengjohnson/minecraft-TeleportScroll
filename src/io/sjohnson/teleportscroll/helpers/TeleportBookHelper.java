@@ -66,7 +66,21 @@ public class TeleportBookHelper {
 
     public void removeTeleportScrolls(Player player, ItemStack teleportBook, int slot)
     {
+        Inventory inventory = player.getInventory();
+        ArrayList<ItemStack> teleportScrolls = getExistingScrolls(teleportBook, false, 0);
+        int emptySlots = ItemHelper.getEmptyInventorySlots(inventory);
 
+        for (ItemStack teleportScroll : teleportScrolls) {
+            if (emptySlots > 0) {
+                inventory.addItem(teleportScroll);
+                emptySlots--;
+            } else {
+                ItemHelper.dropItem(player, teleportScroll);
+            }
+        }
+
+        teleportBook.setAmount(0);
+        putBookInInventory(player, CreateItem.createEmptyTeleportBook(), slot);
     }
 
     public void teleportTo(Player player, ItemStack teleportBook, String teleportIdx, int slot) throws InterruptedException {
@@ -242,6 +256,7 @@ public class TeleportBookHelper {
 
     private ItemStack createBookWithAllTheTeleports(ItemStack originalBook, Player player, ArrayList<ItemStack> teleportScrolls, String JSON) {
         ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
+        ItemHelper.setCustomModel(teleportBook, 10013);
         NBTItem originalNBT = new NBTItem(originalBook);
 
         if (originalNBT.getBoolean("empty_teleport_book")) {
@@ -362,7 +377,7 @@ public class TeleportBookHelper {
             putBookInInventory(player, newBook, slot);
         } else {
             oldBook.setAmount(0);
-            putBookInInventory(player, CreateItem.createTeleportBook(), slot);
+            putBookInInventory(player, CreateItem.createEmptyTeleportBook(), slot);
         }
 
     }
