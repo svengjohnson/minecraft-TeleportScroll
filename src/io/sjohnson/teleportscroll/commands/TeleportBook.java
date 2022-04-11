@@ -2,7 +2,6 @@ package io.sjohnson.teleportscroll.commands;
 
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import io.sjohnson.teleportscroll.helpers.TeleportBookHelper;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
