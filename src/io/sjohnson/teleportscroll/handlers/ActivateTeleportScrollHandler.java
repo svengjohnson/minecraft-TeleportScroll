@@ -35,7 +35,7 @@ public class ActivateTeleportScrollHandler {
     }
 
     private void storeLocation(Player player, ItemStack stack) {
-        if (ItemHelper.getEmptyInventorySlots(player.getInventory()) > 0) {
+        if (ItemHelper.getEmptyInventorySlots(player.getInventory()) == 0) {
             player.sendMessage(ChatColor.RED + "Need at least 1 free inventory space");
             return;
         }
