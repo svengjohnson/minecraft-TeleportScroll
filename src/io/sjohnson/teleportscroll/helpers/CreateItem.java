@@ -56,11 +56,6 @@ public class CreateItem {
         nbtItem.setBoolean("is_teleport_scroll", true);
         nbtItem.setInteger("tier", tier);
 
-        if (tier == 3) {
-            // prevent stacking
-            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
-        }
-
         return nbtItem.getItem();
     }
 
@@ -102,6 +97,12 @@ public class CreateItem {
         nbtItem.setInteger("y", y);
         nbtItem.setInteger("z", z);
         nbtItem.setFloat("yaw", yaw);
+
+        if (tier == 3) {
+            // prevent stacking
+            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
+        }
+
 
         ItemStack outputItem = nbtItem.getItem();
         ItemHelper.setItemLore(outputItem, lore);
