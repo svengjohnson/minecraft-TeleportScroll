@@ -10,6 +10,7 @@
 - `/spawnscroll type tier quantity` - An OP only command for spawning Teleport Scrolls. Type 0 is blank and Type 1 is bed.
 
 ### Recipes:
+![image](https://user-images.githubusercontent.com/37660728/162845183-707e94e0-dac3-452d-86bc-7bce432a9fd6.png)
 ![image](https://user-images.githubusercontent.com/37660728/152204909-a6442e14-44f5-481c-b476-c53627ea7f9f.png)
 ![image](https://user-images.githubusercontent.com/37660728/152204849-b6d1c509-542b-42cb-af22-9e06007db556.png)
 ![image](https://user-images.githubusercontent.com/37660728/152204721-311d3368-a5b4-4ec6-b6c7-b4f76d163e8c.png)
