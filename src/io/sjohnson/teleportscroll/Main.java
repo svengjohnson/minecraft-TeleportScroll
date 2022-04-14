@@ -5,6 +5,7 @@ import io.sjohnson.teleportscroll.commands.*;
 import io.sjohnson.teleportscroll.helpers.CreateRecipe;
 import io.sjohnson.teleportscroll.listeners.EntityDamageEventListener;
 import io.sjohnson.teleportscroll.listeners.MobDeathEventListener;
+import io.sjohnson.teleportscroll.listeners.PlayerJoinEventListener;
 import io.sjohnson.teleportscroll.listeners.RightClickItemListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,6 +15,7 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new RightClickItemListener(), this);
         getServer().getPluginManager().registerEvents(new MobDeathEventListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageEventListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinEventListener(this), this);
 
         new CreateRecipe(getServer(), this).registerAll();
         this.getCommand("rename").setExecutor(new Rename());

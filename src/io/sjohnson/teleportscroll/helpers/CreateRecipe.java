@@ -4,14 +4,28 @@ import io.sjohnson.teleportscroll.Main;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
 
 public class CreateRecipe {
 
     Server server;
     Main plugin;
+
+    public static String BLANK_TELEPORT_SCROLL = "blank_teleport_scroll";
+    public static String BLANK_TELEPORT_SCROLL_T2 = "blank_teleport_scroll_t2";
+    public static String BLANK_TELEPORT_SCROLL_T3 = "blank_teleport_scroll_t3";
+    public static String BED_TELEPORT_SCROLL = "bed_teleport_scroll";
+    public static String BED_TELEPORT_SCROLL_T2 = "bed_teleport_scroll_t2";
+    public static String BED_TELEPORT_SCROLL_T3 = "bed_teleport_scroll_t3";
+    public static String LIFESAVER = "lifesaver";
+    public static String EMPTY_TELEPORT_BOOK = "empty_teleport_book";
+
 
     public CreateRecipe(Server server, Main plugin) {
         this.server = server;
@@ -30,8 +44,19 @@ public class CreateRecipe {
         this.server.addRecipe(this.teleportBook());
     }
 
+    public static void discoverAll(Plugin plugin, Player player)
+    {
+        player.discoverRecipe(new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL));
+        player.discoverRecipe(new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL_T2));
+        player.discoverRecipe(new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL_T3));
+        player.discoverRecipe(new NamespacedKey(plugin, BED_TELEPORT_SCROLL));
+        player.discoverRecipe(new NamespacedKey(plugin, BED_TELEPORT_SCROLL_T2));
+        player.discoverRecipe(new NamespacedKey(plugin, BED_TELEPORT_SCROLL_T3));
+        player.discoverRecipe(new NamespacedKey(plugin, EMPTY_TELEPORT_BOOK));
+    }
+
     public ShapedRecipe teleportScroll() {
-        NamespacedKey key = new NamespacedKey(plugin, "teleport_scroll");
+        NamespacedKey key = new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL);
 
         ItemStack teleportScroll = CreateItem.createTeleportScroll(1);
         teleportScroll.setAmount(8);
@@ -49,7 +74,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe enhancedTeleportScroll() {
-        NamespacedKey key = new NamespacedKey(plugin, "enhanced_teleport_scroll");
+        NamespacedKey key = new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL_T2);
 
         ItemStack enhancedTeleportScroll = CreateItem.createTeleportScroll(2);
         enhancedTeleportScroll.setAmount(8);
@@ -68,7 +93,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe eternalTeleportScroll() {
-        NamespacedKey key = new NamespacedKey(plugin, "eternal_teleport_scroll");
+        NamespacedKey key = new NamespacedKey(plugin, BLANK_TELEPORT_SCROLL_T3);
         ItemStack eternalTeleportScroll = CreateItem.createTeleportScroll(3);
 
         ShapedRecipe Recipe = new ShapedRecipe(key, eternalTeleportScroll);
@@ -86,7 +111,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe bedScroll() {
-        NamespacedKey key = new NamespacedKey(plugin, "bed_teleport_scroll");
+        NamespacedKey key = new NamespacedKey(plugin, BED_TELEPORT_SCROLL);
 
         ItemStack teleportScroll = CreateItem.createBedTeleportScroll(1);
         teleportScroll.setAmount(8);
@@ -104,7 +129,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe bedScrollT2() {
-        NamespacedKey key = new NamespacedKey(plugin, "bed_teleport_scroll_2");
+        NamespacedKey key = new NamespacedKey(plugin, BED_TELEPORT_SCROLL_T2);
 
         ItemStack teleportScroll = CreateItem.createBedTeleportScroll(2);
         teleportScroll.setAmount(8);
@@ -124,7 +149,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe bedScrollT3() {
-        NamespacedKey key = new NamespacedKey(plugin, "bed_teleport_scroll_3");
+        NamespacedKey key = new NamespacedKey(plugin, BED_TELEPORT_SCROLL_T3);
 
         ItemStack teleportScroll = CreateItem.createBedTeleportScroll(3);
         teleportScroll.setAmount(1);
@@ -145,7 +170,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe lifesaver() {
-        NamespacedKey key = new NamespacedKey(plugin, "lifesaver");
+        NamespacedKey key = new NamespacedKey(plugin, LIFESAVER);
 
         ItemStack lifesaver = CreateItem.createLifesaver();
 
@@ -164,7 +189,7 @@ public class CreateRecipe {
     }
 
     public ShapedRecipe teleportBook() {
-        NamespacedKey key = new NamespacedKey(plugin, "teleportbook");
+        NamespacedKey key = new NamespacedKey(plugin, EMPTY_TELEPORT_BOOK);
 
         ItemStack teleportBook = CreateItem.createEmptyTeleportBook();
 

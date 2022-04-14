@@ -78,22 +78,16 @@ public class ItemHelper
         return nbtItem.getBoolean("is_lifesaver");
     }
 
-    public static void renameTeleportScroll(ItemStack item, String name)
+    public static void renameTeleportScrollOrBook(ItemStack item, String name)
     {
         if (!isTeleportScroll(item) && !isTeleportBook(item)) {
             return;
         }
 
-        NBTItem nbtItem = new NBTItem(item);
         String newDisplayName;
 
         if (isTeleportScroll(item)) {
-            int tier = nbtItem.getInteger("tier");
-            newDisplayName = switch (tier) {
-                case 2 -> ChatColor.AQUA + name;
-                case 3 -> ChatColor.LIGHT_PURPLE + name;
-                default -> ChatColor.YELLOW + name;
-            };
+            newDisplayName = getCustomTeleportScrollOrBookName(item, name, true);
         } else {
             newDisplayName = ChatColor.GOLD + "" + ChatColor.BOLD + name;
         }
@@ -167,30 +161,97 @@ public class ItemHelper
 
     public static String getDefaultTeleportScrollName(int tier)
     {
+        return getDefaultTeleportScrollName(tier, false);
+    }
+
+
+    public static String getDefaultTeleportScrollName(int tier, boolean bold)
+    {
         switch (tier) {
             case 2 -> {
-                return ChatColor.AQUA + "Enhanced Teleport Scroll";
+                return getTierFormatting(tier, bold) + "Enhanced Teleport Scroll";
             }
             case 3 -> {
-                return ChatColor.LIGHT_PURPLE + "Eternal Teleport Scroll";
+                return getTierFormatting(tier, bold) + "Eternal Teleport Scroll";
             }
             default -> {
-                return ChatColor.YELLOW + "Teleport Scroll";
+                return getTierFormatting(tier, bold) + "Teleport Scroll";
             }
         }
+    }
+
+    public static String getCustomTeleportScrollOrBookName(ItemStack item, String name, boolean bold)
+    {
+        if (!isTeleportScroll(item) && !isTeleportBook(item)) {
+            return null;
+        }
+
+        NBTItem nbtItem = new NBTItem(item);
+        String newDisplayName;
+
+        if (isTeleportScroll(item)) {
+            int tier = nbtItem.getInteger("tier");
+            newDisplayName = getTierFormatting(tier, bold) + name;
+        } else {
+            newDisplayName = ChatColor.GOLD + "" + ChatColor.BOLD + name;
+        }
+
+        return newDisplayName;
+    }
+
+    public static String getCustomTeleportScrollName(int tier, String name, boolean bold)
+    {
+        return getTierFormatting(tier, bold) + ChatColor.stripColor(name);
     }
 
     public static String getDefaultBlankTeleportScrollName(int tier)
     {
         switch (tier) {
             case 2 -> {
-                return ChatColor.AQUA + "Blank Enhanced Teleport Scroll";
+                return getTierFormatting(tier) + "Blank Enhanced Teleport Scroll";
             }
             case 3 -> {
-                return ChatColor.LIGHT_PURPLE + "Blank Eternal Teleport Scroll";
+                return getTierFormatting(tier) + "Blank Eternal Teleport Scroll";
             }
             default -> {
-                return ChatColor.YELLOW + "Blank Teleport Scroll";
+                return getTierFormatting(tier) + "Blank Teleport Scroll";
+            }
+        }
+    }
+
+    public static String getDefaultEmptyTeleportBookName()
+    {
+        return ChatColor.YELLOW + "Empty Teleport Book";
+    }
+
+    public static String getDefaultTeleportBookName(Player player)
+    {
+        String playerName = ChatColor.stripColor(player.getDisplayName());
+        return ChatColor.GOLD + "" + ChatColor.BOLD + playerName + "'s Teleport Book";
+    }
+
+    public static String getTierFormatting(int tier)
+    {
+        return getTierFormatting(tier, false);
+    }
+
+    public static String getTierFormatting(int tier, boolean bold)
+    {
+        String suffix = "";
+
+        if (bold) {
+            suffix = "" + ChatColor.BOLD;
+        }
+
+        switch (tier) {
+            case 2 -> {
+                return ChatColor.AQUA + suffix;
+            }
+            case 3 -> {
+                return ChatColor.LIGHT_PURPLE + suffix;
+            }
+            default -> {
+                return ChatColor.YELLOW + suffix;
             }
         }
     }

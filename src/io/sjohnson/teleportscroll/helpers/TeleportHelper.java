@@ -49,7 +49,12 @@ public class TeleportHelper {
     public static Location getDestinationForTeleportBook(Player player, JsonObject teleport, boolean toBed)
     {
         if (toBed) {
-            return player.getBedSpawnLocation();
+            Location bedSpawnLocation = player.getBedSpawnLocation();
+
+            if (bedSpawnLocation == null) {
+                player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
+                return null;
+            }
         }
 
         String world = teleport.get("world").getAsString();
