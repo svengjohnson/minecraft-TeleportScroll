@@ -1,6 +1,5 @@
 package io.sjohnson.teleportscroll.commands;
 
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -37,7 +36,7 @@ public class Rename implements CommandExecutor {
                 return true;
             }
 
-            ItemHelper.renameTeleportScroll(itemStack, message);
+            ItemHelper.renameTeleportScrollOrBook(itemStack, message);
             return true;
         }
 

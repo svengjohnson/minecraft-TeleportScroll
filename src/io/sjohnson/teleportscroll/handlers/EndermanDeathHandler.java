@@ -124,7 +124,7 @@ public class EndermanDeathHandler {
         ItemStack blankScroll = CreateItem.createTeleportScroll(2);
         ItemStack teleportScroll = CreateItem.createTeleportScrollWithCoords(blankScroll, world.getName(), tp_x, tp_y, tp_z, 0);
         ItemHelper.setCustomModel(teleportScroll, 100010);
-        ItemHelper.renameTeleportScroll(teleportScroll, name);
+        ItemHelper.renameTeleportScrollOrBook(teleportScroll, name);
 
         return teleportScroll;
     }

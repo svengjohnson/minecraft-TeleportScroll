@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -99,6 +100,12 @@ public class TeleportBookHelper {
 
             if (index == id) {
                 Location destination = TeleportHelper.getDestinationForTeleportBook(player, teleport, toBed);
+
+                if (destination == null)
+                {
+                    return;
+                }
+
                 if (TeleportHelper.canTeleport(player, destination, tier, true)) {
                     TeleportHelper.teleport(player, destination, tier, false);
 
@@ -146,7 +153,7 @@ public class TeleportBookHelper {
             boolean bed = jsonScroll.get("teleport_to_bed").getAsBoolean();
             int count = jsonScroll.get("count").getAsInt();
             int tier = jsonScroll.get("tier").getAsInt();
-            String name = jsonScroll.get("name").getAsString();
+            String name = ItemHelper.getCustomTeleportScrollName(tier, jsonScroll.get("name").getAsString(), true);
 
             if (consumeScroll && id == consumeIndex && tier < 3) {
                 count--;
@@ -260,13 +267,21 @@ public class TeleportBookHelper {
         NBTItem originalNBT = new NBTItem(originalBook);
 
         if (originalNBT.getBoolean("empty_teleport_book")) {
-            ItemHelper.setItemName(teleportBook, ChatColor.GOLD + "" + ChatColor.BOLD + "Teleport Book");
+            ItemHelper.setItemName(teleportBook, ItemHelper.getDefaultTeleportBookName(player));
         } else {
             ItemHelper.setItemName(teleportBook, Objects.requireNonNull(originalBook.getItemMeta()).getDisplayName());
         }
 
         BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
         assert bookMeta != null;
+
+        bookMeta.addItemFlags(
+                ItemFlag.HIDE_ATTRIBUTES,
+                ItemFlag.HIDE_UNBREAKABLE,
+                ItemFlag.HIDE_DESTROYS,
+                ItemFlag.HIDE_PLACED_ON,
+                ItemFlag.HIDE_POTION_EFFECTS
+        );
 
         ComponentBuilder page = null;
 
@@ -318,7 +333,7 @@ public class TeleportBookHelper {
     private ComponentBuilder createLinkFromData(int id, int count, int tier, String world, int x, int y, int z, float yaw, String displayName) {
         String name = formatBookLinkName(tier, displayName, count);
         String direction = ItemHelper.getCardinalDirection((int) yaw);
-        String tierName = ItemHelper.getDefaultTeleportScrollName(tier);
+        String tierName = ItemHelper.getDefaultTeleportScrollName(tier, false);
 
         String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", displayName, tierName, world, x, y, z, direction);
 
