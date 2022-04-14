@@ -54,6 +54,8 @@ public class TeleportHelper {
             if (bedSpawnLocation == null) {
                 player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
                 return null;
+            } else {
+                return bedSpawnLocation;
             }
         }
 
