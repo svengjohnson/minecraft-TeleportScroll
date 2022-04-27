@@ -1,5 +1,6 @@
-### Dependencies:
+### Build dependencies:
 - JDK 17
+- Maven
 
 ### Commands:
 - `/rename` - Renames a Teleport Scroll (Excluding Bed Teleport Scrolls)
