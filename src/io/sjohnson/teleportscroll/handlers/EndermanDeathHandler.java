@@ -36,16 +36,18 @@ public class EndermanDeathHandler {
 
         int roll = (int)(Math.random()*(max-min+1)+min);
         boolean is_the_end = Objects.requireNonNull(location.getWorld()).getName().equals("world_the_end");
-        int blank_scroll_req, blank_scroll_req_t2, structure_scroll_req;
+        int blank_scroll_req, blank_scroll_req_t2, structure_scroll_req, empty_teleport_book_req;
 
         if (is_the_end) {
             blank_scroll_req = 20;
             blank_scroll_req_t2 = 30;
             structure_scroll_req = 35;
+            empty_teleport_book_req = 0;
         } else {
             blank_scroll_req = 200;
             blank_scroll_req_t2 = 300;
             structure_scroll_req = 350;
+            empty_teleport_book_req = 360;
         }
 
 
@@ -78,6 +80,11 @@ public class EndermanDeathHandler {
             drop = CreateItem.createTeleportScroll(3);
             drop.setAmount(2);
             return drop;
+        }
+
+        // 1% chance to drop an empty teleport book, 0% chance in the end
+        if (roll < empty_teleport_book_req)  {
+            return CreateItem.createEmptyTeleportBook();
         }
 
         return null;
