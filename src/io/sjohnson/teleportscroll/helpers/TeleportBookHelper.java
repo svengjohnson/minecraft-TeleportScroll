@@ -9,11 +9,13 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.json.Json;
@@ -23,17 +25,72 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class TeleportBookHelper {
-    public static ComponentBuilder getBasePage() {
-        return new ComponentBuilder()
-                .append(ChatColor.BLACK + "[add all scrolls]")
+    public static ComponentBuilder getBasePage(boolean hasVanishingCurse) {
+        ComponentBuilder basePage = new ComponentBuilder();
+
+        basePage.append(ChatColor.BLACK + "[add all scrolls]")
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook addScrolls"))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Adds all of the teleport scrolls from your inventory").create()))
                 .append("\n")
                 .append(ChatColor.BLACK + "[remove all scrolls]")
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook removeScrolls"))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Removes all of the scrolls and puts them in your inventory\n(or on the ground, if you don't have room in your inventory").create()))
-                .append("\n")
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Removes all of the scrolls and puts them in your inventory\nor on the ground, if you don't have room in your inventory").create()))
                 .append("\n");
+
+        if (!hasVanishingCurse) {
+            basePage.append(ChatColor.BLACK + "[add vanishing curse]")
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook addVanishingCurse"))
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Adds Curse of Vanishing to your Teleport Book\n(Requires a Curse of Vanishing book in your inventory!)").create()))
+                    .append("\n");
+        }
+
+        basePage.append("\n");
+
+        return basePage;
+    }
+
+    public void recreateBook(Player player, ItemStack teleportBook, int slot) {
+        if (!ItemHelper.isTeleportBook(teleportBook)) {
+            player.sendMessage(ChatColor.RED + "An unknown error occurred");
+            return;
+        }
+
+        ArrayList<ItemStack> inventoryScrolls = getInventoryScrolls(player.getInventory());
+        ArrayList<ItemStack> bedScrolls = getInventoryBedScrolls(player.getInventory());
+
+        ArrayList<ItemStack> allTeleports = getExistingAndInventoryTeleportScrolls(teleportBook, bedScrolls, inventoryScrolls);
+
+        String scrollJson = getTeleportScrollJSON(allTeleports);
+        ItemStack newBook = createBookWithAllTheTeleports(teleportBook, player, allTeleports, scrollJson);
+
+        teleportBook.setAmount(0);
+        putBookInInventory(player, newBook, slot);
+        removeInventoryScrolls(bedScrolls, inventoryScrolls);
+    }
+
+    public void addVanishingCurse(Player player, ItemStack teleportBook, int slot) {
+        ItemStack vanishingBook = this.getVanishingBook(player.getInventory());
+
+        if (teleportBook.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+            return;
+        }
+
+        NBTItem nbtItem = new NBTItem(teleportBook);
+
+        if (vanishingBook == null) {
+            player.sendMessage(ChatColor.RED + "You don't have an Enchanted Book containing the Curse of Vanishing enchantment in your inventory!");
+            return;
+        }
+
+        vanishingBook.setAmount(0);
+
+        if (nbtItem.getBoolean("empty_teleport_book")) {
+            teleportBook.setAmount(0);
+            putBookInInventory(player, CreateItem.createEmptyTeleportBook(true), slot);
+        } else {
+            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+            this.recreateBook(player, teleportBook, slot);
+        }
     }
 
     public void addTeleportScrolls(Player player, ItemStack teleportBook, int slot) {
@@ -80,8 +137,10 @@ public class TeleportBookHelper {
             }
         }
 
+        boolean withVanishingCurse = teleportBook.containsEnchantment(Enchantment.VANISHING_CURSE);
+
         teleportBook.setAmount(0);
-        putBookInInventory(player, CreateItem.createEmptyTeleportBook(), slot);
+        putBookInInventory(player, CreateItem.createEmptyTeleportBook(withVanishingCurse), slot);
     }
 
     public void teleportTo(Player player, ItemStack teleportBook, String teleportIdx, int slot) throws InterruptedException {
@@ -223,6 +282,20 @@ public class TeleportBookHelper {
         return teleportScrolls;
     }
 
+    private ItemStack getVanishingBook(Inventory inventory) {
+        for (ItemStack item : inventory.getContents()) {
+            if (item != null && item.getType() == Material.ENCHANTED_BOOK) {
+                EnchantmentStorageMeta meta = (EnchantmentStorageMeta)item.getItemMeta();
+                assert meta != null;
+                if (meta.hasStoredEnchant(Enchantment.VANISHING_CURSE)) {
+                    return item;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private String getTeleportScrollJSON(ArrayList<ItemStack> teleportScrolls) {
         int i = 0;
         JsonArrayBuilder teleportScrollBuilder = Json.createArrayBuilder();
@@ -272,6 +345,17 @@ public class TeleportBookHelper {
             ItemHelper.setItemName(teleportBook, Objects.requireNonNull(originalBook.getItemMeta()).getDisplayName());
         }
 
+        int pages = 1;
+        int totalCount = 0;
+        int firstPageMax = 9;
+        boolean hasVanishingCurse = false;
+
+        if (originalBook.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+            firstPageMax = 10;
+            hasVanishingCurse = true;
+            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+        }
+
         BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
         assert bookMeta != null;
 
@@ -285,15 +369,12 @@ public class TeleportBookHelper {
 
         ComponentBuilder page = null;
 
-        int pages = 1;
-        int totalCount = 0;
-
         int i = 0;
         for (ItemStack teleportScroll : teleportScrolls) {
             totalCount += teleportScroll.getAmount();
             if (page == null) {
                 if (pages == 1) {
-                    page = TeleportBookHelper.getBasePage();
+                    page = TeleportBookHelper.getBasePage(hasVanishingCurse);
                 } else {
                     page = new ComponentBuilder();
                 }
@@ -303,7 +384,7 @@ public class TeleportBookHelper {
             i++;
 
             // Because first page can have only 11 rows, and subsequent ones can have 14
-            if ((i - 10) - (13 * (pages - 1)) > 0) {
+            if ((i - firstPageMax) - (13 * (pages - 1)) > 0) {
                 bookMeta.spigot().addPage(page.create());
                 pages++;
                 page = null;
@@ -392,7 +473,7 @@ public class TeleportBookHelper {
             putBookInInventory(player, newBook, slot);
         } else {
             oldBook.setAmount(0);
-            putBookInInventory(player, CreateItem.createEmptyTeleportBook(), slot);
+            putBookInInventory(player, CreateItem.createEmptyTeleportBook(oldBook.containsEnchantment(Enchantment.VANISHING_CURSE)), slot);
         }
 
     }

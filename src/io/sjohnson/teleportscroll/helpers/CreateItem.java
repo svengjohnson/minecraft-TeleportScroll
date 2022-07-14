@@ -194,9 +194,14 @@ public class CreateItem {
         return nbtItem.getItem();
     }
 
-    public static ItemStack createEmptyTeleportBook()
+    public static ItemStack createEmptyTeleportBook(boolean withVanishingCurse)
     {
         ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
+
+        if (withVanishingCurse) {
+            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+        }
+
         ItemHelper.setItemName(teleportBook, ItemHelper.getDefaultEmptyTeleportBookName());
         ItemHelper.setCustomModel(teleportBook, 10012);
 
@@ -214,7 +219,7 @@ public class CreateItem {
 
         BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
 
-        BaseComponent[] basePage = TeleportBookHelper.getBasePage().create();
+        BaseComponent[] basePage = TeleportBookHelper.getBasePage(withVanishingCurse).create();
 
         bookMeta.spigot().addPage(basePage);
         bookMeta.setTitle("");

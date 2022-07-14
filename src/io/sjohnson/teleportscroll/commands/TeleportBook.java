@@ -48,6 +48,9 @@ public class TeleportBook implements CommandExecutor {
                         e.printStackTrace();
                     }
                     break;
+                case "addVanishingCurse":
+                    teleportBookHelper.addVanishingCurse(player, teleportBook, slot);
+                    break;
                 default:
             }
 

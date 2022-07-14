@@ -84,7 +84,7 @@ public class EndermanDeathHandler {
 
         // 1% chance to drop an empty teleport book, 0% chance in the end
         if (roll < empty_teleport_book_req)  {
-            return CreateItem.createEmptyTeleportBook();
+            return CreateItem.createEmptyTeleportBook(false);
         }
 
         return null;

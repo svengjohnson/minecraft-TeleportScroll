@@ -191,7 +191,7 @@ public class CreateRecipe {
     public ShapedRecipe teleportBook() {
         NamespacedKey key = new NamespacedKey(plugin, EMPTY_TELEPORT_BOOK);
 
-        ItemStack teleportBook = CreateItem.createEmptyTeleportBook();
+        ItemStack teleportBook = CreateItem.createEmptyTeleportBook(false);
 
         ShapedRecipe Recipe = new ShapedRecipe(key, teleportBook);
         Recipe.shape(

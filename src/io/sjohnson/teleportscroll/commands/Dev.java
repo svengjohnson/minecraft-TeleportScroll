@@ -14,7 +14,7 @@ public class Dev implements CommandExecutor {
                 return true;
             }
 
-            player.getInventory().addItem(CreateItem.createEmptyTeleportBook());
+            player.getInventory().addItem(CreateItem.createEmptyTeleportBook(false));
         }
 
         return true;
