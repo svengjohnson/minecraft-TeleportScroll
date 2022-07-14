@@ -12,10 +12,6 @@ public class TeleportBook implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player) {
-            if (!player.isOp()) {
-                return true;
-            }
-
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             ItemStack offHand = player.getInventory().getItemInOffHand();
             ItemStack teleportBook;
