@@ -165,8 +165,8 @@ public class TeleportBookHelper {
                     return;
                 }
 
-                if (TeleportHelper.canTeleport(player, destination, tier, true)) {
-                    TeleportHelper.teleport(player, destination, tier, false);
+                if (TeleportHelper.canTeleport(player, destination, tier, true, false)) {
+                    TeleportHelper.teleport(player, destination, tier, false, false);
 
                     if (tier < 3) {
                         consumeTeleport(player, teleportBook, id, slot);

@@ -22,12 +22,12 @@ public class ActivateTeleportScrollHandler {
 
             Location targetLocation = TeleportHelper.getDestinationForTeleportScroll(player, nbtItem, item);
 
-            if (TeleportHelper.canTeleport(player, targetLocation, tier, false)) {
+            if (TeleportHelper.canTeleport(player, targetLocation, tier, false, true)) {
                 if (tier < 3) {
                     item.setAmount(item.getAmount() - 1);
                 }
 
-                TeleportHelper.teleport(player, targetLocation, tier, false);
+                TeleportHelper.teleport(player, targetLocation, tier, false, true);
             }
         } else {
             this.storeLocation(player, item);

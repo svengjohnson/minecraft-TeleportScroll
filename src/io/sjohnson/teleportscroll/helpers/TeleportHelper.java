@@ -73,8 +73,8 @@ public class TeleportHelper {
         return targetLocation;
     }
 
-    public static boolean teleport(Player player, Location destination, int tier, boolean showAlreadyThere) throws InterruptedException {
-        if (!canTeleport(player, destination, tier, showAlreadyThere)) {
+    public static boolean teleport(Player player, Location destination, int tier, boolean showAlreadyThere, boolean mustBeOnTheGround) throws InterruptedException {
+        if (!canTeleport(player, destination, tier, showAlreadyThere, mustBeOnTheGround)) {
             return false;
         }
 
@@ -99,7 +99,7 @@ public class TeleportHelper {
         return true;
     }
 
-    public static boolean canTeleport(Player player, Location targetLocation, int tier, boolean showAlreadyThere) {
+    public static boolean canTeleport(Player player, Location targetLocation, int tier, boolean showAlreadyThere, boolean mustBeOnTheGround) {
 
         if (alreadyThere(player.getLocation(), targetLocation)) {
             if (showAlreadyThere) {
@@ -113,7 +113,7 @@ public class TeleportHelper {
             return false;
         }
 
-        if (!player.isOnGround()) {
+        if (!player.isOnGround() && mustBeOnTheGround) {
             player.sendMessage(ChatColor.YELLOW + "You must be on the ground to teleport");
             return false;
         }
