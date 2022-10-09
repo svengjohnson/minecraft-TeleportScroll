@@ -90,6 +90,7 @@
             <artifactId>spigot-api</artifactId>
             <version>1.19.2-R0.1-SNAPSHOT</version>
             <classifier>sources</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -97,6 +98,7 @@
             <artifactId>spigot-api</artifactId>
             <version>1.19.2-R0.1-SNAPSHOT</version>
             <classifier>javadoc</classifier>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
