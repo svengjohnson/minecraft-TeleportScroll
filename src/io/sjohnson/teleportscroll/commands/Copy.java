@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
-public class Copy implements CommandExecutor {
+public class   Copy implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player player) {

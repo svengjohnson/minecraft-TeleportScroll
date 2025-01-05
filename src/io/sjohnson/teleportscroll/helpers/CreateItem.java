@@ -44,10 +44,12 @@ public class CreateItem {
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
+                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
+                ItemFlag.HIDE_DYE,
+                ItemFlag.HIDE_ARMOR_TRIM
         );
         item.setItemMeta(Meta);
-        item.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 1);
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
 
         NBTItem nbtItem = new NBTItem(item);
         nbtItem.setBoolean("is_teleport_scroll", true);
@@ -160,7 +162,7 @@ public class CreateItem {
         ItemHelper.setItemName(bedScroll, name);
         ItemHelper.setItemLore(bedScroll, ChatColor.WHITE + "Teleports you to your respawn point");
         ItemHelper.setCustomModel(bedScroll, customModel);
-        bedScroll.removeEnchantment(Enchantment.PROTECTION_EXPLOSIONS);
+        bedScroll.removeEnchantment(Enchantment.PROTECTION);
 
         NBTItem nbtItem = new NBTItem(bedScroll);
         nbtItem.setBoolean("teleport_to_bed", true);
@@ -178,11 +180,14 @@ public class CreateItem {
         assert Meta != null;
 
         Meta.addItemFlags(
+                ItemFlag.HIDE_ENCHANTS,
                 ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
+                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
+                ItemFlag.HIDE_DYE,
+                ItemFlag.HIDE_ARMOR_TRIM
         );
         lifesaver.setItemMeta(Meta);
         lifesaver.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
@@ -209,11 +214,14 @@ public class CreateItem {
         assert Meta != null;
 
         Meta.addItemFlags(
+                ItemFlag.HIDE_ENCHANTS,
                 ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
+                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
+                ItemFlag.HIDE_DYE,
+                ItemFlag.HIDE_ARMOR_TRIM
         );
         teleportBook.setItemMeta(Meta);
 

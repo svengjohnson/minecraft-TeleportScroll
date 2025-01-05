@@ -13,7 +13,6 @@ public class ParticleHelper {
         double offsetY = 2;
         double offsetZ = 1;
 
-        player.spawnParticle(Particle.SPELL_INSTANT, location, count, offsetX, offsetY, offsetZ);
-        player.spawnParticle(Particle.SPELL_WITCH, location, count, offsetX, offsetY, offsetZ);
+        player.spawnParticle(Particle.FIREWORK, location, count, offsetX, offsetY, offsetZ);
     }
 }

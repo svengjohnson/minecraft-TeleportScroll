@@ -1,10 +1,10 @@
 package io.sjohnson.teleportscroll.helpers;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.objects.BaseTeleportScroll;
+import io.sjohnson.teleportscroll.objects.BedTeleportScroll;
+import io.sjohnson.teleportscroll.objects.LocationTeleportScroll;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -18,9 +18,9 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
+import com.google.gson.JsonArray;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -298,7 +298,8 @@ public class TeleportBookHelper {
 
     private String getTeleportScrollJSON(ArrayList<ItemStack> teleportScrolls) {
         int i = 0;
-        JsonArrayBuilder teleportScrollBuilder = Json.createArrayBuilder();
+
+        List<BaseTeleportScroll> baseTeleportScrollList = new ArrayList<>();
 
         for (ItemStack teleportScroll : teleportScrolls) {
             NBTItem nbtScroll = new NBTItem(teleportScroll);
@@ -306,32 +307,28 @@ public class TeleportBookHelper {
             assert scrollMeta != null;
 
             if (ItemHelper.isBedTeleportScroll(teleportScroll)) {
-                teleportScrollBuilder.add(Json.createObjectBuilder()
-                        .add("id", i)
-                        .add("count", teleportScroll.getAmount())
-                        .add("tier", nbtScroll.getInteger("tier"))
-                        .add("name", scrollMeta.getDisplayName())
-                        .add("teleport_to_bed", true)
-                );
+                baseTeleportScrollList.add(new BedTeleportScroll(i,
+                        teleportScroll.getAmount(),
+                        nbtScroll.getInteger("tier"),
+                        scrollMeta.getDisplayName()));
             } else {
-                teleportScrollBuilder.add(Json.createObjectBuilder()
-                        .add("id", i)
-                        .add("count", teleportScroll.getAmount())
-                        .add("tier", nbtScroll.getInteger("tier"))
-                        .add("name", scrollMeta.getDisplayName())
-                        .add("world", nbtScroll.getString("world"))
-                        .add("x", nbtScroll.getInteger("x"))
-                        .add("y", nbtScroll.getInteger("y"))
-                        .add("z", nbtScroll.getInteger("z"))
-                        .add("yaw", nbtScroll.getFloat("yaw"))
-                        .add("teleport_to_bed", false)
-                );
+                baseTeleportScrollList.add(new LocationTeleportScroll(
+                        i,
+                        teleportScroll.getAmount(),
+                        nbtScroll.getInteger("tier"),
+                        scrollMeta.getDisplayName(),
+                        nbtScroll.getString("world"),
+                        nbtScroll.getInteger("x"),
+                        nbtScroll.getInteger("y"),
+                        nbtScroll.getInteger("z"),
+                        nbtScroll.getFloat("yaw")
+                ));
             }
 
             i++;
         }
 
-        return teleportScrollBuilder.build().toString();
+        return new Gson().toJson(baseTeleportScrollList);
     }
 
     private ItemStack createBookWithAllTheTeleports(ItemStack originalBook, Player player, ArrayList<ItemStack> teleportScrolls, String JSON) {
@@ -360,11 +357,14 @@ public class TeleportBookHelper {
         assert bookMeta != null;
 
         bookMeta.addItemFlags(
+                ItemFlag.HIDE_ENCHANTS,
                 ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_POTION_EFFECTS
+                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
+                ItemFlag.HIDE_DYE,
+                ItemFlag.HIDE_ARMOR_TRIM
         );
 
         ComponentBuilder page = null;

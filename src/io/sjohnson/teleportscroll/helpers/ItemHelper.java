@@ -1,10 +1,8 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import io.sjohnson.teleportscroll.objects.CustomModelData;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -100,7 +98,8 @@ public class ItemHelper
         ItemMeta meta = item.getItemMeta();
 
         assert meta != null;
-        meta.setCustomModelData(model);
+
+        meta.setCustomModelDataComponent(CustomModelData.fromModelId(model));
 
         item.setItemMeta(meta);
     }
