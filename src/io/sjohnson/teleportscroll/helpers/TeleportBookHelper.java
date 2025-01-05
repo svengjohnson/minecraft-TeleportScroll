@@ -357,7 +357,6 @@ public class TeleportBookHelper {
         assert bookMeta != null;
 
         bookMeta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
                 ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_UNBREAKABLE,
                 ItemFlag.HIDE_DESTROYS,
@@ -366,6 +365,10 @@ public class TeleportBookHelper {
                 ItemFlag.HIDE_DYE,
                 ItemFlag.HIDE_ARMOR_TRIM
         );
+
+        if (hasVanishingCurse) {
+            bookMeta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
 
         ComponentBuilder page = null;
 

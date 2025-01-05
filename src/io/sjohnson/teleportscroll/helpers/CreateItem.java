@@ -223,6 +223,11 @@ public class CreateItem {
                 ItemFlag.HIDE_DYE,
                 ItemFlag.HIDE_ARMOR_TRIM
         );
+
+        if (withVanishingCurse) {
+            Meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+
         teleportBook.setItemMeta(Meta);
 
         BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
