@@ -218,17 +218,6 @@ public class ItemHelper
         }
     }
 
-    public static String getDefaultEmptyTeleportBookName()
-    {
-        return ChatColor.YELLOW + "Empty Teleport Book";
-    }
-
-    public static String getDefaultTeleportBookName(Player player)
-    {
-        String playerName = ChatColor.stripColor(player.getDisplayName());
-        return ChatColor.GOLD + "" + ChatColor.BOLD + playerName + "'s Teleport Book";
-    }
-
     public static String getTierFormatting(int tier)
     {
         return getTierFormatting(tier, false);

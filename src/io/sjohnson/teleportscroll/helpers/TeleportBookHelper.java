@@ -2,9 +2,7 @@ package io.sjohnson.teleportscroll.helpers;
 
 import com.google.gson.*;
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import io.sjohnson.teleportscroll.objects.BaseTeleportScroll;
-import io.sjohnson.teleportscroll.objects.BedTeleportScroll;
-import io.sjohnson.teleportscroll.objects.LocationTeleportScroll;
+import io.sjohnson.teleportscroll.objects.*;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -12,17 +10,13 @@ import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.google.gson.JsonArray;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 public class TeleportBookHelper {
     public static ComponentBuilder getBasePage(boolean hasVanishingCurse) {
@@ -332,140 +326,12 @@ public class TeleportBookHelper {
     }
 
     private ItemStack createBookWithAllTheTeleports(ItemStack originalBook, Player player, ArrayList<ItemStack> teleportScrolls, String JSON) {
-        ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
-        ItemHelper.setCustomModel(teleportBook, 10013);
-        NBTItem originalNBT = new NBTItem(originalBook);
-
-        if (originalNBT.getBoolean("empty_teleport_book")) {
-            ItemHelper.setItemName(teleportBook, ItemHelper.getDefaultTeleportBookName(player));
-        } else {
-            ItemHelper.setItemName(teleportBook, Objects.requireNonNull(originalBook.getItemMeta()).getDisplayName());
-        }
-
-        int pages = 1;
-        int totalCount = 0;
-        int firstPageMax = 9;
-        boolean hasVanishingCurse = false;
-
-        if (originalBook.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-            firstPageMax = 10;
-            hasVanishingCurse = true;
-            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
-        }
-
-        BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
-        assert bookMeta != null;
-
-        bookMeta.addItemFlags(
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
-                ItemFlag.HIDE_DYE,
-                ItemFlag.HIDE_ARMOR_TRIM
-        );
-
-        if (hasVanishingCurse) {
-            bookMeta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-
-        ComponentBuilder page = null;
-
-        int i = 0;
-        for (ItemStack teleportScroll : teleportScrolls) {
-            totalCount += teleportScroll.getAmount();
-            if (page == null) {
-                if (pages == 1) {
-                    page = TeleportBookHelper.getBasePage(hasVanishingCurse);
-                } else {
-                    page = new ComponentBuilder();
-                }
-            }
-
-            page.append(this.createLinkFromItemStack(i, teleportScroll).create());
-            i++;
-
-            // Because first page can have only 11 rows, and subsequent ones can have 14
-            if ((i - firstPageMax) - (13 * (pages - 1)) > 0) {
-                bookMeta.spigot().addPage(page.create());
-                pages++;
-                page = null;
-            }
-        }
-
-        if (page != null) {
-            bookMeta.spigot().addPage(page.create());
-        }
-
-        bookMeta.setTitle(player.getDisplayName() + "'s Teleport Book");
-        bookMeta.setAuthor(player.getDisplayName());
-        teleportBook.setItemMeta(bookMeta);
-
-        ItemHelper.setItemLore(teleportBook, ChatColor.GOLD + "Contains " + i + " unique teleport scroll(s);Total teleport scrolls: " + totalCount);
-
-        NBTItem nbtItem = new NBTItem(teleportBook);
-        nbtItem.setBoolean("is_teleport_book", true);
-        nbtItem.setBoolean("empty_teleport_book", false);
-        nbtItem.setInteger("generation", 3);
-        nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
-        nbtItem.setString("json", JSON);
-
-        return nbtItem.getItem();
-    }
-
-    private ComponentBuilder createLinkFromData(int id, int count, int tier, String world, int x, int y, int z, float yaw, String displayName) {
-        String name = formatBookLinkName(tier, displayName, count);
-        String direction = ItemHelper.getCardinalDirection((int) yaw);
-        String tierName = ItemHelper.getDefaultTeleportScrollName(tier, false);
-
-        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", displayName, tierName, world, x, y, z, direction);
-
-        return new ComponentBuilder()
-                .append(name)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook teleportTo " + id))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(altText).create()))
-                .append("\n");
-    }
-
-    private ComponentBuilder createBedTeleportScrollLink(int id, int count, int tier, String displayName) {
-        String name = formatBookLinkName(tier, displayName, count);
-        String tierName = ItemHelper.getBedTeleportScrollName(tier);
-
-        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "Teleports you to your respawn point", displayName, tierName);
-
-        return new ComponentBuilder()
-                .append(name)
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook teleportTo " + id))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(altText).create()))
-                .append("\n");
-    }
-
-    private ComponentBuilder createLinkFromItemStack(int id, ItemStack itemStack) {
-        NBTItem nbtItem = new NBTItem(itemStack);
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        assert itemMeta != null;
-
-
-        int count = itemStack.getAmount();
-        int tier = nbtItem.getInteger("tier");
-        String displayName = itemMeta.getDisplayName();
-
-        if (ItemHelper.isBedTeleportScroll(itemStack)) {
-            return createBedTeleportScrollLink(id, count, tier, displayName);
-        } else {
-            String world = nbtItem.getString("world");
-            int x = nbtItem.getInteger("x");
-            int y = nbtItem.getInteger("y");
-            int z = nbtItem.getInteger("z");
-            float yaw = nbtItem.getFloat("yaw");
-
-            return createLinkFromData(id, count, tier, world, x, y, z, yaw, displayName);
-        }
+        return TeleportBook.create(originalBook, player, teleportScrolls, JSON);
     }
 
     private void consumeTeleport(Player player, ItemStack oldBook, int indexToConsume, int slot)
     {
+        boolean hasVanishing = oldBook.containsEnchantment(Enchantment.VANISHING_CURSE);
         ArrayList<ItemStack> newScrolls = getExistingScrolls(oldBook, true, indexToConsume);
 
         if (newScrolls.size() > 0) {
@@ -476,36 +342,9 @@ public class TeleportBookHelper {
             putBookInInventory(player, newBook, slot);
         } else {
             oldBook.setAmount(0);
-            putBookInInventory(player, CreateItem.createEmptyTeleportBook(oldBook.containsEnchantment(Enchantment.VANISHING_CURSE)), slot);
+            putBookInInventory(player, CreateItem.createEmptyTeleportBook(hasVanishing), slot);
         }
 
-    }
-
-    private String formatBookLinkName(int tier, String displayName, int count)
-    {
-        String truncatedName = truncate(ChatColor.stripColor(displayName), tier);
-
-        return switch (tier) {
-            case 2 -> ChatColor.BLUE + "" + truncatedName + " (" + count + ")";
-            case 3 -> ChatColor.DARK_PURPLE + "" + truncatedName;
-            default -> ChatColor.GOLD + "" + truncatedName + " (" + count + ")";
-        };
-    }
-
-    private String truncate(String value, int tier) {
-        int maxlength;
-
-        if (tier == 3) {
-            maxlength = 19;
-        } else {
-            maxlength = 15;
-        }
-
-        if (value.length() > maxlength) {
-            return value.substring(0, maxlength - 2) + "...";
-        } else {
-            return value;
-        }
     }
 
     private void putBookInInventory(Player player, ItemStack teleportBook, int slot)

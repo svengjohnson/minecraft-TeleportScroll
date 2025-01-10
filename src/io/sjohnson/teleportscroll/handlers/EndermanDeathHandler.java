@@ -39,33 +39,34 @@ public class EndermanDeathHandler {
         int blank_scroll_req, blank_scroll_req_t2, structure_scroll_req, empty_teleport_book_req;
 
         if (is_the_end) {
+            return null;
+//            blank_scroll_req = 20;
+//            blank_scroll_req_t2 = 30;
+//            structure_scroll_req = 35;
+//            empty_teleport_book_req = 0;
+        } else {
             blank_scroll_req = 20;
             blank_scroll_req_t2 = 30;
             structure_scroll_req = 35;
-            empty_teleport_book_req = 0;
-        } else {
-            blank_scroll_req = 200;
-            blank_scroll_req_t2 = 300;
-            structure_scroll_req = 350;
-            empty_teleport_book_req = 360;
+            empty_teleport_book_req = 36;
         }
 
 
-        // 20% chance on getting a 8x blank tier 1 scroll as a drop, 2% in the end
+        // 2% chance on getting a 4x blank tier 1 scroll as a drop
         if (roll < blank_scroll_req) {
             drop = CreateItem.createTeleportScroll(1);
-            drop.setAmount(8);
+            drop.setAmount(4);
             return drop;
         }
 
-        // 10% chance on getting a 8x blank tier 2 scroll as a drop, 1% in the end
+        // 1% chance on getting a 4x blank tier 2 scroll as a drop
         if (roll < blank_scroll_req_t2) {
             drop = CreateItem.createTeleportScroll(2);
-            drop.setAmount(8);
+            drop.setAmount(4);
             return drop;
         }
 
-        // 5% chance on rolling a Structure Teleport Scroll, 0.5% in the end
+        // 0.5% chance on rolling a Structure Teleport Scroll,
         if (roll < structure_scroll_req) {
             ItemStack structureTeleportScroll;
 
@@ -76,13 +77,13 @@ public class EndermanDeathHandler {
                 }
             }
 
-            // drop 2x blank tier 3 scrolls if we failed to find a structure or a safe location
+            // drop 1x blank tier 3 scrolls if we failed to find a structure or a safe location
             drop = CreateItem.createTeleportScroll(3);
-            drop.setAmount(2);
+            drop.setAmount(1);
             return drop;
         }
 
-        // 1% chance to drop an empty teleport book, 0% chance in the end
+        // 0.1% chance to drop an empty teleport book, 0% chance in the end
         if (roll < empty_teleport_book_req)  {
             return CreateItem.createEmptyTeleportBook(false);
         }

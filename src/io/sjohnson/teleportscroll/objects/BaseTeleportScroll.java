@@ -1,6 +1,6 @@
 package io.sjohnson.teleportscroll.objects;
 
-public class BaseTeleportScroll {
+public abstract class BaseTeleportScroll {
     int id;
     int count;
     int tier;

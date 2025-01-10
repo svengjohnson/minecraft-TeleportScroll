@@ -1,13 +1,12 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.*;
-import net.md_5.bungee.api.chat.BaseComponent;
+import io.sjohnson.teleportscroll.objects.TeleportBook;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import java.util.UUID;
 
@@ -201,52 +200,6 @@ public class CreateItem {
 
     public static ItemStack createEmptyTeleportBook(boolean withVanishingCurse)
     {
-        ItemStack teleportBook = new ItemStack(Material.WRITTEN_BOOK);
-
-        if (withVanishingCurse) {
-            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
-        }
-
-        ItemHelper.setItemName(teleportBook, ItemHelper.getDefaultEmptyTeleportBookName());
-        ItemHelper.setCustomModel(teleportBook, 10012);
-
-        ItemMeta Meta = teleportBook.getItemMeta();
-        assert Meta != null;
-
-        Meta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
-                ItemFlag.HIDE_DYE,
-                ItemFlag.HIDE_ARMOR_TRIM
-        );
-
-        if (withVanishingCurse) {
-            Meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
-        }
-
-        teleportBook.setItemMeta(Meta);
-
-        BookMeta bookMeta = (BookMeta) teleportBook.getItemMeta();
-
-        BaseComponent[] basePage = TeleportBookHelper.getBasePage(withVanishingCurse).create();
-
-        bookMeta.spigot().addPage(basePage);
-        bookMeta.setTitle("");
-        bookMeta.setAuthor("");
-        teleportBook.setItemMeta(bookMeta);
-
-
-        NBTItem nbtItem = new NBTItem(teleportBook);
-        nbtItem.setBoolean("is_teleport_book", true);
-        nbtItem.setBoolean("empty_teleport_book", true);
-        nbtItem.setInteger("generation", 3);
-        // prevent stacking
-        nbtItem.setString("teleport_book_uuid", UUID.randomUUID().toString());
-
-        return nbtItem.getItem();
+        return TeleportBook.create(withVanishingCurse);
     }
 }
