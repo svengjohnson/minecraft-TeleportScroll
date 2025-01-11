@@ -1,80 +1,52 @@
 package io.sjohnson.teleportscroll.helpers;
 
-import com.google.gson.JsonObject;
-import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.objects.ItemizableTeleportScroll;
+import io.sjohnson.teleportscroll.objects.LocationTeleportScroll;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.concurrent.TimeUnit;
 
+import static java.util.Objects.isNull;
+
 public class TeleportHelper {
-    public static Location getDestinationForTeleportScroll(Player player, NBTItem nbtItem, ItemStack item)
-    {
-        Location targetLocation = null;
-
-        if (ItemHelper.isBedTeleportScroll(item)) {
-            Location bedSpawnLocation = player.getBedSpawnLocation();
-
-            if (bedSpawnLocation == null) {
-                player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
-                return null;
-            }
-
-            targetLocation = bedSpawnLocation;
-
-        } else if (ItemHelper.isTeleportScroll(item)) {
-            String world = nbtItem.getString("world");
-            double x = nbtItem.getInteger("x") + 0.5;
-            int y = nbtItem.getInteger("y");
-            double z = nbtItem.getInteger("z") + 0.5;
-            float yaw;
-
-            if (nbtItem.hasKey("yaw")) {
-                yaw = nbtItem.getFloat("yaw");
-            } else {
-                yaw = 0;
-            }
-
-            World tpWorld = Bukkit.getWorld(world);
-            Location location = new Location(tpWorld, x, y, z);
-            location.setYaw(yaw);
-
-            targetLocation = location;
+    public static Location getDestination(Player player, ItemizableTeleportScroll teleport) {
+        if (teleport.toBed()) {
+            return TeleportHelper.getBedSpawnLocation(player);
         }
+
+        LocationTeleportScroll locationTeleport = (LocationTeleportScroll) teleport;
+
+        World world = Bukkit.getWorld(locationTeleport.getWorld());
+
+        Location targetLocation = new Location(world,
+                locationTeleport.getX() + 0.5,
+                locationTeleport.getY(),
+                locationTeleport.getZ() + 0.5);
+
+        targetLocation.setYaw(locationTeleport.getYaw());
 
         return targetLocation;
     }
 
-    public static Location getDestinationForTeleportBook(Player player, JsonObject teleport, boolean toBed)
-    {
-        if (toBed) {
-            Location bedSpawnLocation = player.getBedSpawnLocation();
+    public static Location getBedSpawnLocation(Player player) {
+        Location bedSpawnLocation = player.getBedSpawnLocation();
 
-            if (bedSpawnLocation == null) {
-                player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
-                return null;
-            } else {
-                return bedSpawnLocation;
-            }
+        if (bedSpawnLocation == null) {
+            player.sendMessage(ChatColor.YELLOW + "You do not have a bed spawn set or your bed is obstructed");
+            return null;
+        } else {
+            return bedSpawnLocation;
         }
-
-        String world = teleport.get("world").getAsString();
-        double x = teleport.get("x").getAsInt() + 0.5;
-        int y = teleport.get("y").getAsInt();
-        double z = teleport.get("z").getAsInt() + 0.5;
-        float yaw = teleport.get("yaw").getAsInt();
-
-
-        World tpWorld = Bukkit.getWorld(world);
-        Location targetLocation = new Location(tpWorld, x, y, z);
-        targetLocation.setYaw(yaw);
-
-        return targetLocation;
     }
 
-    public static boolean teleport(Player player, Location destination, int tier, boolean showAlreadyThere, boolean mustBeOnTheGround) throws InterruptedException {
-        if (!canTeleport(player, destination, tier, showAlreadyThere, mustBeOnTheGround)) {
+    public static boolean teleport(Player player,
+                                   Location destination,
+                                   ItemizableTeleportScroll teleportScroll,
+                                   boolean showAlreadyThere,
+                                   boolean mustBeOnTheGround)
+            throws InterruptedException {
+        if (!canTeleport(player, destination, teleportScroll, showAlreadyThere, mustBeOnTheGround)) {
             return false;
         }
 
@@ -99,7 +71,14 @@ public class TeleportHelper {
         return true;
     }
 
-    public static boolean canTeleport(Player player, Location targetLocation, int tier, boolean showAlreadyThere, boolean mustBeOnTheGround) {
+    public static boolean canTeleport(Player player,
+                                      Location targetLocation,
+                                      ItemizableTeleportScroll teleportScroll,
+                                      boolean showAlreadyThere,
+                                      boolean mustBeOnTheGround) {
+        if (isNull(targetLocation)) {
+            return false;
+        }
 
         if (alreadyThere(player.getLocation(), targetLocation)) {
             if (showAlreadyThere) {
@@ -108,7 +87,7 @@ public class TeleportHelper {
             return false;
         }
 
-        if (!sameWorld(player, targetLocation) && tier < 2) {
+        if (!sameWorld(player, targetLocation) && teleportScroll.getTier() < 2) {
             player.sendMessage(ChatColor.YELLOW + "Can't teleport to a different dimension with this scroll!");
             return false;
         }

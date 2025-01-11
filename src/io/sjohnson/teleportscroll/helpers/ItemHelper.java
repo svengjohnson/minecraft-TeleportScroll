@@ -1,6 +1,7 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.objects.NBTFields;
 import io.sjohnson.teleportscroll.objects.model.CustomModelData;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -21,7 +22,7 @@ public class ItemHelper
 
         NBTItem nbtItem = new NBTItem(item);
 
-        return nbtItem.getBoolean("is_teleport_scroll");
+        return nbtItem.getBoolean(NBTFields.IS_TELEPORT_SCROLL);
     }
 
     public static boolean isTeleportBook(ItemStack item)
@@ -32,37 +33,33 @@ public class ItemHelper
 
         NBTItem nbtItem = new NBTItem(item);
 
-        return nbtItem.getBoolean("is_teleport_book");
+        return nbtItem.getBoolean(NBTFields.IS_TELEPORT_BOOK);
     }
 
     public static boolean isBedTeleportScroll(ItemStack item)
     {
-        if (item == null || item.getType() == Material.AIR) {
-            return false;
-        }
-
         if (!isTeleportScroll(item)) {
             return false;
         }
 
         NBTItem nbtItem = new NBTItem(item);
 
-        return nbtItem.getBoolean("teleport_to_bed");
+        return nbtItem.getBoolean(NBTFields.TELEPORT_TO_BED);
+    }
+
+    public static boolean isBlankTeleportScroll(ItemStack item) {
+        return !ItemHelper.isBedTeleportScroll(item) && !ItemHelper.isCoordinateTeleportScroll(item);
     }
 
     public static boolean isCoordinateTeleportScroll(ItemStack item)
     {
-        if (item == null || item.getType() == Material.AIR) {
-            return false;
-        }
-
         if (!isTeleportScroll(item)) {
             return false;
         }
 
         NBTItem nbtItem = new NBTItem(item);
 
-        return nbtItem.hasKey("x");
+        return nbtItem.hasKey(NBTFields.X);
     }
 
     public static boolean isLifesaver(ItemStack item)
@@ -132,42 +129,6 @@ public class ItemHelper
         return i;
     }
 
-    public static String getBedTeleportScrollName(int tier)
-    {
-        switch (tier) {
-            case 2 -> {
-                return ChatColor.AQUA + "Enhanced Bed Teleport Scroll";
-            }
-            case 3 -> {
-                return ChatColor.LIGHT_PURPLE + "Eternal Bed Teleport Scroll";
-            }
-            default -> {
-                return ChatColor.YELLOW + "Bed Teleport Scroll";
-            }
-        }
-    }
-
-    public static String getDefaultTeleportScrollName(int tier)
-    {
-        return getDefaultTeleportScrollName(tier, false);
-    }
-
-
-    public static String getDefaultTeleportScrollName(int tier, boolean bold)
-    {
-        switch (tier) {
-            case 2 -> {
-                return getTierFormatting(tier, bold) + "Enhanced Teleport Scroll";
-            }
-            case 3 -> {
-                return getTierFormatting(tier, bold) + "Eternal Teleport Scroll";
-            }
-            default -> {
-                return getTierFormatting(tier, bold) + "Teleport Scroll";
-            }
-        }
-    }
-
     public static String getCustomTeleportScrollOrBookName(ItemStack item, String name, boolean bold)
     {
         if (!isTeleportScroll(item) && !isTeleportBook(item)) {
@@ -185,11 +146,6 @@ public class ItemHelper
         }
 
         return newDisplayName;
-    }
-
-    public static String getCustomTeleportScrollName(int tier, String name, boolean bold)
-    {
-        return getTierFormatting(tier, bold) + ChatColor.stripColor(name);
     }
 
     public static String getTierFormatting(int tier, boolean bold)
@@ -210,19 +166,6 @@ public class ItemHelper
             default -> {
                 return ChatColor.YELLOW + suffix;
             }
-        }
-    }
-
-    public static String getCardinalDirection(int yaw)
-    {
-        if (yaw == 180) {
-            return "N";
-        } else if (yaw == -90) {
-            return "E";
-        } else if (yaw == 90) {
-            return "W";
-        } else {
-            return "S";
         }
     }
 

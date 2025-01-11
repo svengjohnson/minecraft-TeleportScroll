@@ -10,48 +10,49 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class BaseItem extends ItemStack {
+public abstract class BaseItem {
+    protected ItemStack item;
 
-    public BaseItem(Material material) {
-        super(material);
+    protected BaseItem(Material material) {
+        this.item = new ItemStack(material);
     }
 
-    public BaseItem(ItemStack itemStack) {
-        super(itemStack);
+    protected BaseItem(ItemStack itemStack) {
+        this.item = itemStack;
     }
 
-    public void setDisplayName(String displayName) {
-        ItemMeta meta = getItemMeta();
+    protected void setDisplayName(String displayName) {
+        ItemMeta meta = item.getItemMeta();
 
         assert meta != null;
         meta.setDisplayName(displayName);
 
-        setItemMeta(meta);
+        item.setItemMeta(meta);
     }
 
-    public void setCustomModel(int model)
+    protected void setCustomModel(int model)
     {
-        ItemMeta meta = getItemMeta();
+        ItemMeta meta = item.getItemMeta();
 
         assert meta != null;
 
         meta.setCustomModelDataComponent(CustomModelData.fromModelId(model));
 
-        setItemMeta(meta);
+        item.setItemMeta(meta);
     }
 
-    public void setLore(String lore)
+    protected void setLore(String lore)
     {
-        ItemMeta meta = getItemMeta();
+        ItemMeta meta = item.getItemMeta();
 
         assert meta != null;
         meta.setLore(formatLore(lore));
 
-        setItemMeta(meta);
+        item.setItemMeta(meta);
     }
 
-    public void addItemFlags(boolean withVanishingCurse) {
-        ItemMeta Meta = getItemMeta();
+    protected void addItemFlags(boolean withVanishingCurse) {
+        ItemMeta Meta = item.getItemMeta();
         assert Meta != null;
 
         Meta.addItemFlags(
@@ -69,15 +70,15 @@ public abstract class BaseItem extends ItemStack {
             Meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        setItemMeta(Meta);
+        item.setItemMeta(Meta);
     }
 
-    public String getTierFormatting(int tier)
+    protected String getTierFormatting(int tier)
     {
         return getTierFormatting(tier, false);
     }
 
-    public String getTierFormatting(int tier, boolean bold)
+    protected String getTierFormatting(int tier, boolean bold)
     {
         String suffix = "";
 
@@ -98,7 +99,45 @@ public abstract class BaseItem extends ItemStack {
         }
     }
 
-    public String formatTextWithTierFormatting(int tier, boolean bold, String text) {
+    private String formatLinkName(int tier, String text)
+    {
+          switch (tier) {
+            case 2 -> {
+                return ChatColor.DARK_BLUE + text;
+            }
+            case 3 -> {
+                return ChatColor.DARK_PURPLE + text;
+            }
+            default -> {
+                return ChatColor.GOLD + text;
+            }
+        }
+    }
+
+    protected String formatLinkName(int tier, String displayName, int count)
+    {
+        String truncatedName = truncate(ChatColor.stripColor(displayName), tier);
+
+        return formatLinkName(tier, String.format("%s (%s)", truncatedName, count));
+    }
+
+    private String truncate(String value, int tier) {
+        int maxlength;
+
+        if (tier == 3) {
+            maxlength = 19;
+        } else {
+            maxlength = 15;
+        }
+
+        if (value.length() > maxlength) {
+            return value.substring(0, maxlength - 2) + "...";
+        } else {
+            return value;
+        }
+    }
+
+    protected String formatTextWithTierFormatting(int tier, boolean bold, String text) {
         return getTierFormatting(tier, bold) + text;
     }
 

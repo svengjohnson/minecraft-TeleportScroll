@@ -3,6 +3,10 @@ package io.sjohnson.teleportscroll.objects;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.objects.json.JsonBedTeleportScroll;
 import io.sjohnson.teleportscroll.objects.model.CustomModel;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -10,54 +14,73 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
-public class BedTeleportScroll extends BaseItem {
+public class BedTeleportScroll extends BaseItem implements ItemizableTeleportScroll {
     private int id;
     private int tier;
     private int count;
     private String name;
     private String displayName;
 
-    private BedTeleportScroll(int tier) {
+    public BedTeleportScroll(int tier) {
         super(Material.PAPER);
 
         this.tier = tier;
         this.count = 1;
-        this.name = getName(tier);
-        this.displayName = getName(tier);
+        this.name = getName();
+        this.displayName = getName();
 
         setModel();
         setLore(getLore());
         setDisplayName(displayName);
-        setAmount(count);
         addItemFlags(false);
+
+        item.setAmount(count);
     }
 
-    private BedTeleportScroll(int tier, int count, String name) {
+    public BedTeleportScroll(int tier, int count, String name) {
         super(Material.PAPER);
 
         this.tier = tier;
         this.count = count;
-        this.name = getName(tier);
+        this.name = getName();
         this.displayName = name;
 
         setModel();
         setLore(getLore());
         setDisplayName(displayName);
-        setAmount(count);
         addItemFlags(false);
+
+        item.setAmount(count);
+    }
+
+    public BedTeleportScroll(int id, int tier, int count, String name) {
+        super(Material.PAPER);
+
+        this.id = id;
+        this.tier = tier;
+        this.count = count;
+        this.name = getName();
+        this.displayName = name;
+
+        setModel();
+        setLore(getLore());
+        setDisplayName(displayName);
+        addItemFlags(false);
+
+        item.setAmount(count);
     }
 
     public BedTeleportScroll(ItemStack item, int id) {
         super(item);
 
         NBTItem nbtScroll = new NBTItem(item);
-        ItemMeta meta = getItemMeta();
+        ItemMeta meta = item.getItemMeta();
         assert meta != null;
 
         this.id = id;
         this.tier = nbtScroll.getInteger(NBTFields.TIER);
-        this.count = getAmount();
-        this.name = getName(tier);
+        this.count = item.getAmount();
+        this.name = getName();
         this.displayName = meta.getDisplayName();
     }
 
@@ -66,7 +89,7 @@ public class BedTeleportScroll extends BaseItem {
     }
 
     public static ItemStack create(int tier, int count, String name) {
-        return new BedTeleportScroll(tier, count, name).toItem();
+        return new BedTeleportScroll(tier, count, ChatColor.stripColor(name)).toItem();
     }
 
     public static JsonBedTeleportScroll getObject(ItemStack item, int id) {
@@ -107,20 +130,35 @@ public class BedTeleportScroll extends BaseItem {
         return tier;
     }
 
-    public int getCount() {
-        return count;
+    public void setCount(int count) {
+        this.count = count;
+        item.setAmount(count);
     }
 
-    public String getName() {
-        return name;
+    public int getCount() {
+        return count;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    private ItemStack toItem() {
-        NBTItem nbtItem = new NBTItem(this);
+    public BaseComponent[] toLink() {
+        String name = formatLinkName(tier, displayName, count);
+        String tierName = getName();
+
+        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "Teleports you to your respawn point", displayName, tierName);
+
+        return new ComponentBuilder()
+                .append(name)
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook teleportTo " + id))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(altText).create()))
+                .append("\n")
+                .create();
+    }
+
+    public ItemStack toItem() {
+        NBTItem nbtItem = new NBTItem(item);
 
         nbtItem.setBoolean(NBTFields.IS_TELEPORT_SCROLL, true);
         nbtItem.setInteger(NBTFields.TIER, tier);
@@ -134,7 +172,7 @@ public class BedTeleportScroll extends BaseItem {
         return nbtItem.getItem();
     }
 
-    public String getName(int tier)
+    public String getName()
     {
         switch (tier) {
             case 2 -> {
@@ -149,11 +187,7 @@ public class BedTeleportScroll extends BaseItem {
         }
     }
 
-    private static class NBTFields {
-        private NBTFields() {}
-        public static final String IS_TELEPORT_SCROLL = "is_teleport_scroll";
-        public static final String TIER = "tier";
-        public static final String T3_SCROLL_UUID = "t3_scroll_uuid";
-        public static final String TELEPORT_TO_BED = "teleport_to_bed";
+    public boolean toBed() {
+        return true;
     }
 }

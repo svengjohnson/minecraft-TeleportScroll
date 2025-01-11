@@ -17,8 +17,9 @@ public class BlankLocationTeleportScroll extends BaseItem {
         setModel();
         setDisplayName(getName(tier));
         setLore(getName(tier));
-        addUnsafeEnchantment(Enchantment.PROTECTION, 1);
         addItemFlags(false);
+
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
     }
 
     public BlankLocationTeleportScroll(ItemStack itemStack) {
@@ -33,11 +34,11 @@ public class BlankLocationTeleportScroll extends BaseItem {
     }
 
     public static ItemStack create(int tier) {
-        return new BlankLocationTeleportScroll(tier).getItem();
+        return new BlankLocationTeleportScroll(tier).toItem();
     }
 
-    private ItemStack getItem() {
-        NBTItem nbtItem = new NBTItem(this);
+    public ItemStack toItem() {
+        NBTItem nbtItem = new NBTItem(item);
         nbtItem.setBoolean(NBTFields.IS_TELEPORT_SCROLL, true);
         nbtItem.setInteger(NBTFields.TIER, tier);
 
@@ -71,11 +72,5 @@ public class BlankLocationTeleportScroll extends BaseItem {
                 return getTierFormatting(tier) + "Blank Teleport Scroll";
             }
         }
-    }
-
-    private static class NBTFields {
-        private NBTFields() {}
-        public static final String IS_TELEPORT_SCROLL = "is_teleport_scroll";
-        public static final String TIER = "tier";
     }
 }

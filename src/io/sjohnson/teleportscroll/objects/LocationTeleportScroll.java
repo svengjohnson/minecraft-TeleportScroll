@@ -3,6 +3,10 @@ package io.sjohnson.teleportscroll.objects;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.objects.json.JsonLocationTeleportScroll;
 import io.sjohnson.teleportscroll.objects.model.CustomModel;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -11,7 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
-public class LocationTeleportScroll extends BaseItem {
+public class LocationTeleportScroll extends BaseItem implements ItemizableTeleportScroll {
     private int id;
     private int tier;
     private String name;
@@ -23,7 +27,7 @@ public class LocationTeleportScroll extends BaseItem {
     private float yaw;
     private int count;
 
-    private LocationTeleportScroll(ItemStack blankScroll, String world, double x, double y, double z, float yaw) {
+    public LocationTeleportScroll(ItemStack blankScroll, String world, double x, double y, double z, float yaw) {
         super(Material.PAPER);
 
         BlankLocationTeleportScroll blank = new BlankLocationTeleportScroll(blankScroll);
@@ -40,12 +44,36 @@ public class LocationTeleportScroll extends BaseItem {
         setModel();
         setLore(getLore());
         setDisplayName(displayName);
-        addUnsafeEnchantment(Enchantment.PROTECTION, 1);
         addItemFlags(false);
-        setAmount(1);
+
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
+        item.setAmount(1);
     }
 
-    private LocationTeleportScroll(int tier, String world, double x, double y, double z, float yaw, String name, int count) {
+    public LocationTeleportScroll(int id, int tier, String world, double x, double y, double z, float yaw, String name, int count) {
+        super(Material.PAPER);
+
+        this.id = id;
+        this.world = world;
+        this.x = calculateX(x);
+        this.y = calculateY(y);
+        this.z = calculateZ(z);
+        this.yaw = calculateYaw(yaw);
+        this.tier = tier;
+        this.displayName = getTierFormatting(tier, true) + name;
+        this.count = count;
+        this.name = getName(false);
+
+        setModel();
+        setLore(getLore());
+        setDisplayName(displayName);
+        addItemFlags(false);
+
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
+        item.setAmount(count);
+    }
+
+    public LocationTeleportScroll(int tier, String world, double x, double y, double z, float yaw, String name, int count) {
         super(Material.PAPER);
 
         this.world = world;
@@ -61,9 +89,10 @@ public class LocationTeleportScroll extends BaseItem {
         setModel();
         setLore(getLore());
         setDisplayName(displayName);
-        addUnsafeEnchantment(Enchantment.PROTECTION, 1);
         addItemFlags(false);
-        setAmount(count);
+
+        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
+        item.setAmount(count);
     }
 
     public LocationTeleportScroll(ItemStack item, int id) {
@@ -75,7 +104,7 @@ public class LocationTeleportScroll extends BaseItem {
 
         this.id = id;
         this.tier = nbtScroll.getInteger(NBTFields.TIER);
-        this.name = nbtScroll.getString(NBTFields.NAME);
+        this.name = nbtScroll.getString(NBTFields.ITEM_NAME);
         this.displayName = meta.getDisplayName();
         this.world = nbtScroll.getString(NBTFields.WORLD);
         this.x = nbtScroll.getInteger(NBTFields.X);
@@ -90,7 +119,7 @@ public class LocationTeleportScroll extends BaseItem {
     }
 
     public static ItemStack create(int tier, String world, double x, double y, double z, float yaw, String name, int count) {
-        return new LocationTeleportScroll(tier, world, x, y, z, yaw, name, count).toItem();
+        return new LocationTeleportScroll(tier, world, x, y, z, yaw, ChatColor.stripColor(name), count).toItem();
     }
 
     public static JsonLocationTeleportScroll getObject(ItemStack item, int id) {
@@ -122,10 +151,6 @@ public class LocationTeleportScroll extends BaseItem {
         return displayName;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public String getWorld() {
         return world;
     }
@@ -148,6 +173,11 @@ public class LocationTeleportScroll extends BaseItem {
 
     public int getCount() {
         return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+        item.setAmount(count);
     }
 
     private float calculateYaw(float trueYaw)
@@ -199,8 +229,8 @@ public class LocationTeleportScroll extends BaseItem {
         }
     }
 
-    private ItemStack toItem() {
-        NBTItem nbtItem = new NBTItem(this);
+    public ItemStack toItem() {
+        NBTItem nbtItem = new NBTItem(item);
 
         nbtItem.setBoolean(NBTFields.IS_TELEPORT_SCROLL, true);
         nbtItem.setInteger(NBTFields.TIER, tier);
@@ -210,7 +240,7 @@ public class LocationTeleportScroll extends BaseItem {
         nbtItem.setInteger(NBTFields.Y, y);
         nbtItem.setInteger(NBTFields.Z, z);
         nbtItem.setFloat(NBTFields.YAW, yaw);
-        nbtItem.setString(NBTFields.NAME, name);
+        nbtItem.setString(NBTFields.ITEM_NAME, name);
         nbtItem.setBoolean(NBTFields.TELEPORT_TO_BED, false);
 
         if (tier == 3) {
@@ -219,6 +249,21 @@ public class LocationTeleportScroll extends BaseItem {
         }
 
         return nbtItem.getItem();
+    }
+
+    public BaseComponent[] toLink() {
+        String name = formatLinkName(tier, displayName, count);
+        String direction = getDirection();
+        String tierName = getName();
+
+        String altText = String.format("%s\n%s\n" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", displayName, tierName, world, x, y, z, direction);
+
+        return new ComponentBuilder()
+                .append(name)
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook teleportTo " + id))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(altText).create()))
+                .append("\n")
+                .create();
     }
 
     private String getLore() {
@@ -237,6 +282,10 @@ public class LocationTeleportScroll extends BaseItem {
         }
     }
 
+    public String getName() {
+        return getName(false);
+    }
+
     private String getName(boolean bold)
     {
         switch (tier) {
@@ -251,25 +300,15 @@ public class LocationTeleportScroll extends BaseItem {
         }
     }
 
-    private static class NBTFields {
-        private NBTFields() {}
-        public static final String IS_TELEPORT_SCROLL = "is_teleport_scroll";
-        public static final String TIER = "tier";
-        public static final String WORLD = "world";
-        public static final String X = "x";
-        public static final String Y = "y";
-        public static final String Z = "z";
-        public static final String YAW = "yaw";
-        public static final String T3_SCROLL_UUID = "t3_scroll_uuid";
-        public static final String NAME = "name";
-        public static final String TELEPORT_TO_BED = "teleport_to_bed";
-    }
-
     private static class Direction {
         private Direction() {}
         public static final String N = "N";
         public static final String E = "E";
         public static final String W = "W";
         public static final String S = "S";
+    }
+
+    public boolean toBed() {
+        return false;
     }
 }
