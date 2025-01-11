@@ -1,10 +1,11 @@
-package io.sjohnson.teleportscroll.objects;
+package io.sjohnson.teleportscroll.objects.json;
 
-public abstract class BaseTeleportScroll {
+public abstract class JsonTeleportScroll {
     int id;
     int count;
     int tier;
     String name;
+    String display_name;
     String world;
     int x;
     int y;

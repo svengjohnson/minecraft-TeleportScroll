@@ -1,7 +1,7 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.NBTItem;
-import io.sjohnson.teleportscroll.objects.CustomModelData;
+import io.sjohnson.teleportscroll.objects.model.CustomModelData;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -91,17 +91,6 @@ public class ItemHelper
         }
 
         setItemName(item, newDisplayName);
-    }
-
-    public static void setCustomModel(ItemStack item, int model)
-    {
-        ItemMeta meta = item.getItemMeta();
-
-        assert meta != null;
-
-        meta.setCustomModelDataComponent(CustomModelData.fromModelId(model));
-
-        item.setItemMeta(meta);
     }
 
     public static void setItemLore(ItemStack item, String lore)
@@ -201,26 +190,6 @@ public class ItemHelper
     public static String getCustomTeleportScrollName(int tier, String name, boolean bold)
     {
         return getTierFormatting(tier, bold) + ChatColor.stripColor(name);
-    }
-
-    public static String getDefaultBlankTeleportScrollName(int tier)
-    {
-        switch (tier) {
-            case 2 -> {
-                return getTierFormatting(tier) + "Blank Enhanced Teleport Scroll";
-            }
-            case 3 -> {
-                return getTierFormatting(tier) + "Blank Eternal Teleport Scroll";
-            }
-            default -> {
-                return getTierFormatting(tier) + "Blank Teleport Scroll";
-            }
-        }
-    }
-
-    public static String getTierFormatting(int tier)
-    {
-        return getTierFormatting(tier, false);
     }
 
     public static String getTierFormatting(int tier, boolean bold)

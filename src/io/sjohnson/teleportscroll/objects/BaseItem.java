@@ -1,7 +1,8 @@
 package io.sjohnson.teleportscroll.objects;
 
+import io.sjohnson.teleportscroll.objects.model.CustomModelData;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,6 +16,10 @@ public abstract class BaseItem extends ItemStack {
         super(material);
     }
 
+    public BaseItem(ItemStack itemStack) {
+        super(itemStack);
+    }
+
     public void setDisplayName(String displayName) {
         ItemMeta meta = getItemMeta();
 
@@ -22,14 +27,6 @@ public abstract class BaseItem extends ItemStack {
         meta.setDisplayName(displayName);
 
         setItemMeta(meta);
-    }
-
-    public String getDisplayName() {
-        ItemMeta meta = getItemMeta();
-
-        assert meta != null;
-
-        return meta.getDisplayName();
     }
 
     public void setCustomModel(int model)
@@ -73,6 +70,36 @@ public abstract class BaseItem extends ItemStack {
         }
 
         setItemMeta(Meta);
+    }
+
+    public String getTierFormatting(int tier)
+    {
+        return getTierFormatting(tier, false);
+    }
+
+    public String getTierFormatting(int tier, boolean bold)
+    {
+        String suffix = "";
+
+        if (bold) {
+            suffix = "" + ChatColor.BOLD;
+        }
+
+        switch (tier) {
+            case 2 -> {
+                return ChatColor.AQUA + suffix;
+            }
+            case 3 -> {
+                return ChatColor.LIGHT_PURPLE + suffix;
+            }
+            default -> {
+                return ChatColor.YELLOW + suffix;
+            }
+        }
+    }
+
+    public String formatTextWithTierFormatting(int tier, boolean bold, String text) {
+        return getTierFormatting(tier, bold) + text;
     }
 
     private ArrayList<String> formatLore(String lore)

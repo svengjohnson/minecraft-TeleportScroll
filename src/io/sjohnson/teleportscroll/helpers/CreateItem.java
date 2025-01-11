@@ -1,7 +1,10 @@
 package io.sjohnson.teleportscroll.helpers;
 
 import de.tr7zw.changeme.nbtapi.*;
+import io.sjohnson.teleportscroll.objects.BedTeleportScroll;
+import io.sjohnson.teleportscroll.objects.BlankLocationTeleportScroll;
 import io.sjohnson.teleportscroll.objects.TeleportBook;
+import io.sjohnson.teleportscroll.objects.LocationTeleportScroll;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -13,160 +16,32 @@ import java.util.UUID;
 public class CreateItem {
     public static ItemStack createTeleportScroll(int tier)
     {
-        Material material = Material.PAPER;
-        String displayName = ItemHelper.getDefaultBlankTeleportScrollName(tier);
-        int customModel;
-
-        switch (tier) {
-            case 3 -> {
-                customModel = 10003;
-            }
-            case 2 -> {
-                customModel = 10002;
-            }
-            default -> {
-                customModel = 10001;
-            }
-        }
-
-        ItemStack item = new ItemStack(material);
-        ItemHelper.setItemName(item, displayName);
-        ItemHelper.setItemLore(item, displayName);
-        ItemHelper.setCustomModel(item, customModel);
-
-        ItemMeta Meta = item.getItemMeta();
-        assert Meta != null;
-
-        Meta.addItemFlags(
-                ItemFlag.HIDE_ENCHANTS,
-                ItemFlag.HIDE_ATTRIBUTES,
-                ItemFlag.HIDE_UNBREAKABLE,
-                ItemFlag.HIDE_DESTROYS,
-                ItemFlag.HIDE_PLACED_ON,
-                ItemFlag.HIDE_ADDITIONAL_TOOLTIP,
-                ItemFlag.HIDE_DYE,
-                ItemFlag.HIDE_ARMOR_TRIM
-        );
-        item.setItemMeta(Meta);
-        item.addUnsafeEnchantment(Enchantment.PROTECTION, 1);
-
-        NBTItem nbtItem = new NBTItem(item);
-        nbtItem.setBoolean("is_teleport_scroll", true);
-        nbtItem.setInteger("tier", tier);
-
-        return nbtItem.getItem();
+        return BlankLocationTeleportScroll.create(tier);
     }
 
-    public static ItemStack createTeleportScrollWithCoords(ItemStack item, String world, int x, int y, int z, float yaw)
+    public static ItemStack createTeleportScrollWithCoords(ItemStack item, String world, double x, double y, double z, float yaw)
     {
-
-        NBTItem nbtItem = new NBTItem(item.clone());
-
-        int tier = nbtItem.getInteger("tier");
-        String displayName = ItemHelper.getDefaultTeleportScrollName(tier, true);
-        String name = ItemHelper.getDefaultTeleportScrollName(tier, false);
-        String direction;
-        int customModel;
-
-        if (yaw == 180) {
-            direction = "N";
-        } else if (yaw == -90) {
-            direction = "E";
-        } else if (yaw == 90) {
-            direction = "W";
-        } else {
-            direction = "S";
-        }
-
-        switch (tier) {
-            case 2 -> {
-                customModel = 10005;
-            }
-            case 3 -> {
-                customModel = 10006;
-            }
-            default -> {
-                customModel = 10004;
-            }
-        }
-
-        String lore = String.format("%s;" + ChatColor.WHITE + "%s X %s Y %s Z %s %s", name, world, x, y, z, direction);
-        nbtItem.setString("world", world);
-        nbtItem.setInteger("x", x);
-        nbtItem.setInteger("y", y);
-        nbtItem.setInteger("z", z);
-        nbtItem.setFloat("yaw", yaw);
-
-        if (tier == 3) {
-            // prevent stacking
-            nbtItem.setString("t3_scroll_uuid", UUID.randomUUID().toString());
-        }
-
-        ItemStack outputItem = nbtItem.getItem();
-        ItemHelper.setItemLore(outputItem, lore);
-        ItemHelper.setItemName(outputItem, displayName);
-        ItemHelper.setCustomModel(outputItem, customModel);
-        outputItem.setAmount(1);
-
-        return outputItem;
+        return LocationTeleportScroll.create(item, world, x, y, z, yaw);
     }
 
-    public static ItemStack createCustomTeleportScroll(int count, int tier, String name, String world, int x, int y, int z, float yaw)
+    public static ItemStack createCustomTeleportScroll(int count, int tier, String name, String world, double x, double y, double z, float yaw)
     {
-        ItemStack baseScroll = createTeleportScroll(tier);
-        ItemStack outputScroll = createTeleportScrollWithCoords(baseScroll, world, x, y, z, yaw);
-
-        ItemMeta outputScrollMeta = outputScroll.getItemMeta();
-        assert outputScrollMeta != null;
-
-        outputScrollMeta.setDisplayName(name);
-        outputScroll.setItemMeta(outputScrollMeta);
-        outputScroll.setAmount(count);
-
-        return outputScroll;
+        return LocationTeleportScroll.create(tier, world, x, y, z, yaw, name, count);
     }
 
     public static ItemStack createCustomBedTeleportScroll(int count, int tier, String name)
     {
-        ItemStack outputScroll = createBedTeleportScroll(tier);
-
-        ItemMeta outputScrollMeta = outputScroll.getItemMeta();
-        assert outputScrollMeta != null;
-
-        outputScrollMeta.setDisplayName(name);
-        outputScroll.setItemMeta(outputScrollMeta);
-        outputScroll.setAmount(count);
-
-        return outputScroll;
+        return BedTeleportScroll.create(tier, count, name);
     }
 
     public static ItemStack createBedTeleportScroll(int tier)
     {
-        ItemStack bedScroll = createTeleportScroll(tier);
-        String name = ItemHelper.getBedTeleportScrollName(tier);
-        int customModel;
+        return BedTeleportScroll.create(tier);
+    }
 
-        switch (tier) {
-            case 2 -> {
-                customModel = 10008;
-            }
-            case 3 -> {
-                customModel = 10009;
-            }
-            default -> {
-                customModel = 10007;
-            }
-        }
-
-        ItemHelper.setItemName(bedScroll, name);
-        ItemHelper.setItemLore(bedScroll, ChatColor.WHITE + "Teleports you to your respawn point");
-        ItemHelper.setCustomModel(bedScroll, customModel);
-        bedScroll.removeEnchantment(Enchantment.PROTECTION);
-
-        NBTItem nbtItem = new NBTItem(bedScroll);
-        nbtItem.setBoolean("teleport_to_bed", true);
-
-        return nbtItem.getItem();
+    public static ItemStack createEmptyTeleportBook(boolean withVanishingCurse)
+    {
+        return TeleportBook.create(withVanishingCurse);
     }
 
     public static ItemStack createLifesaver()
@@ -196,10 +71,5 @@ public class CreateItem {
         // prevent stacking
         nbtItem.setString("lifesaver_uuid", UUID.randomUUID().toString());
         return nbtItem.getItem();
-    }
-
-    public static ItemStack createEmptyTeleportBook(boolean withVanishingCurse)
-    {
-        return TeleportBook.create(withVanishingCurse);
     }
 }

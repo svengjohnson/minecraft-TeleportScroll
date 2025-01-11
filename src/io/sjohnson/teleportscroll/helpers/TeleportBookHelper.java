@@ -3,9 +3,9 @@ package io.sjohnson.teleportscroll.helpers;
 import com.google.gson.*;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import io.sjohnson.teleportscroll.objects.*;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
+import io.sjohnson.teleportscroll.objects.json.JsonTeleportScroll;
+import io.sjohnson.teleportscroll.objects.json.JsonBedTeleportScroll;
+import io.sjohnson.teleportscroll.objects.json.JsonLocationTeleportScroll;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -19,72 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeleportBookHelper {
-    public static ComponentBuilder getBasePage(boolean hasVanishingCurse) {
-        ComponentBuilder basePage = new ComponentBuilder();
-
-        basePage.append(ChatColor.BLACK + "[add all scrolls]")
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook addScrolls"))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Adds all of the teleport scrolls from your inventory").create()))
-                .append("\n")
-                .append(ChatColor.BLACK + "[remove all scrolls]")
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook removeScrolls"))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Removes all of the scrolls and puts them in your inventory\nor on the ground, if you don't have room in your inventory").create()))
-                .append("\n");
-
-        if (!hasVanishingCurse) {
-            basePage.append(ChatColor.BLACK + "[add vanishing curse]")
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/teleportbook addVanishingCurse"))
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Adds Curse of Vanishing to your Teleport Book\n(Requires a Curse of Vanishing book in your inventory!)").create()))
-                    .append("\n");
-        }
-
-        basePage.append("\n");
-
-        return basePage;
-    }
-
-    public void recreateBook(Player player, ItemStack teleportBook, int slot) {
-        if (!ItemHelper.isTeleportBook(teleportBook)) {
-            player.sendMessage(ChatColor.RED + "An unknown error occurred");
-            return;
-        }
-
-        ArrayList<ItemStack> inventoryScrolls = getInventoryScrolls(player.getInventory());
-        ArrayList<ItemStack> bedScrolls = getInventoryBedScrolls(player.getInventory());
-
-        ArrayList<ItemStack> allTeleports = getExistingAndInventoryTeleportScrolls(teleportBook, bedScrolls, inventoryScrolls);
-
-        String scrollJson = getTeleportScrollJSON(allTeleports);
-        ItemStack newBook = createBookWithAllTheTeleports(teleportBook, player, allTeleports, scrollJson);
-
-        teleportBook.setAmount(0);
-        putBookInInventory(player, newBook, slot);
-        removeInventoryScrolls(bedScrolls, inventoryScrolls);
-    }
-
     public void addVanishingCurse(Player player, ItemStack teleportBook, int slot) {
         ItemStack vanishingBook = this.getVanishingBook(player.getInventory());
-
-        if (teleportBook.containsEnchantment(Enchantment.VANISHING_CURSE)) {
-            return;
-        }
-
-        NBTItem nbtItem = new NBTItem(teleportBook);
 
         if (vanishingBook == null) {
             player.sendMessage(ChatColor.RED + "You don't have an Enchanted Book containing the Curse of Vanishing enchantment in your inventory!");
             return;
         }
 
-        vanishingBook.setAmount(0);
-
-        if (nbtItem.getBoolean("empty_teleport_book")) {
-            teleportBook.setAmount(0);
-            putBookInInventory(player, CreateItem.createEmptyTeleportBook(true), slot);
-        } else {
-            teleportBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
-            this.recreateBook(player, teleportBook, slot);
+        if (teleportBook.containsEnchantment(Enchantment.VANISHING_CURSE)) {
+            player.sendMessage(ChatColor.RED + "This teleport book already has the Curse of Vanishing enchantment");
+            return;
         }
+
+        vanishingBook.setAmount(0);
+        putBookInInventory(player, TeleportBook.addVanishingCurse(teleportBook, player), slot);
+        teleportBook.setAmount(0);
     }
 
     public void addTeleportScrolls(Player player, ItemStack teleportBook, int slot) {
@@ -202,11 +152,13 @@ public class TeleportBookHelper {
         ArrayList<ItemStack> teleportScrolls = new ArrayList<>();
 
         for (JsonObject jsonScroll : getExistingScrollJsonObjectArray(teleportBook)) {
+            System.out.println(jsonScroll);
+
             int id = jsonScroll.get("id").getAsInt();
             boolean bed = jsonScroll.get("teleport_to_bed").getAsBoolean();
             int count = jsonScroll.get("count").getAsInt();
             int tier = jsonScroll.get("tier").getAsInt();
-            String name = ItemHelper.getCustomTeleportScrollName(tier, jsonScroll.get("name").getAsString(), true);
+            String name = ItemHelper.getCustomTeleportScrollName(tier, jsonScroll.get("display_name").getAsString(), true);
 
             if (consumeScroll && id == consumeIndex && tier < 3) {
                 count--;
@@ -293,30 +245,13 @@ public class TeleportBookHelper {
     private String getTeleportScrollJSON(ArrayList<ItemStack> teleportScrolls) {
         int i = 0;
 
-        List<BaseTeleportScroll> baseTeleportScrollList = new ArrayList<>();
+        List<JsonTeleportScroll> baseTeleportScrollList = new ArrayList<>();
 
         for (ItemStack teleportScroll : teleportScrolls) {
-            NBTItem nbtScroll = new NBTItem(teleportScroll);
-            ItemMeta scrollMeta = teleportScroll.getItemMeta();
-            assert scrollMeta != null;
-
             if (ItemHelper.isBedTeleportScroll(teleportScroll)) {
-                baseTeleportScrollList.add(new BedTeleportScroll(i,
-                        teleportScroll.getAmount(),
-                        nbtScroll.getInteger("tier"),
-                        scrollMeta.getDisplayName()));
+                baseTeleportScrollList.add(BedTeleportScroll.getObject(teleportScroll, i));
             } else {
-                baseTeleportScrollList.add(new LocationTeleportScroll(
-                        i,
-                        teleportScroll.getAmount(),
-                        nbtScroll.getInteger("tier"),
-                        scrollMeta.getDisplayName(),
-                        nbtScroll.getString("world"),
-                        nbtScroll.getInteger("x"),
-                        nbtScroll.getInteger("y"),
-                        nbtScroll.getInteger("z"),
-                        nbtScroll.getFloat("yaw")
-                ));
+                baseTeleportScrollList.add(LocationTeleportScroll.getObject(teleportScroll, i));
             }
 
             i++;

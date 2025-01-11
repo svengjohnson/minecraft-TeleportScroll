@@ -1,4 +1,4 @@
-package io.sjohnson.teleportscroll.objects;
+package io.sjohnson.teleportscroll.objects.model;
 
 import org.bukkit.Color;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;

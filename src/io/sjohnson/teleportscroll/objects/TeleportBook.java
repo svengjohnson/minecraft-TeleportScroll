@@ -1,6 +1,11 @@
 package io.sjohnson.teleportscroll.objects;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.sjohnson.teleportscroll.helpers.CreateItem;
 import io.sjohnson.teleportscroll.helpers.ItemHelper;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -14,12 +19,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static io.sjohnson.teleportscroll.objects.CustomModel.EMPTY_TELEPORT_BOOK;
-import static io.sjohnson.teleportscroll.objects.CustomModel.TELEPORT_BOOK;
+import static io.sjohnson.teleportscroll.objects.model.CustomModel.EMPTY_TELEPORT_BOOK;
+import static io.sjohnson.teleportscroll.objects.model.CustomModel.TELEPORT_BOOK;
 import static java.util.Objects.nonNull;
 
 public class TeleportBook extends BaseItem {
@@ -76,6 +82,74 @@ public class TeleportBook extends BaseItem {
 
     public static ItemStack create(boolean withVanishingCurse) {
         return new TeleportBook(withVanishingCurse).getItem();
+    }
+
+    public static ItemStack addVanishingCurse(ItemStack existingBook, Player player) {
+        existingBook.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+        NBTItem existingBookNbt = new NBTItem(existingBook);
+
+        if (existingBookNbt.getBoolean(NBTFields.EMPTY_TELEPORT_BOOK)) {
+            return TeleportBook.create(true);
+        }
+
+        return TeleportBook.create(existingBook, player, getTeleportScrolls(existingBook), existingBookNbt.getString(NBTFields.JSON));
+    }
+
+    private static List<ItemStack> getTeleportScrolls(ItemStack teleportBook) {
+        boolean consumeScroll = false;
+        int consumeIndex = 0;
+
+        List<ItemStack> teleportScrolls = new ArrayList<>();
+
+        for (JsonObject jsonScroll : getExistingScrollsJson(teleportBook)) {
+            int id = jsonScroll.get("id").getAsInt();
+            boolean bed = jsonScroll.get("teleport_to_bed").getAsBoolean();
+            int count = jsonScroll.get("count").getAsInt();
+            int tier = jsonScroll.get("tier").getAsInt();
+            String name = ItemHelper.getCustomTeleportScrollName(tier, jsonScroll.get("display_name").getAsString(), true);
+
+            if (consumeScroll && id == consumeIndex && tier < 3) {
+                count--;
+
+                if (count < 1) {
+                    continue;
+                }
+            }
+
+            if (bed) {
+                teleportScrolls.add(BedTeleportScroll.create(tier, count, name));
+            } else {
+                String world = jsonScroll.get("world").getAsString();
+                int x = jsonScroll.get("x").getAsInt();
+                int y = jsonScroll.get("y").getAsInt();
+                int z = jsonScroll.get("z").getAsInt();
+                float yaw = jsonScroll.get("yaw").getAsFloat();
+
+                teleportScrolls.add(LocationTeleportScroll.create(tier, world, x, y, z, yaw, name, count));
+            }
+        }
+
+        return teleportScrolls;
+    }
+
+    private static ArrayList<JsonObject> getExistingScrollsJson(ItemStack teleportBook) {
+        ArrayList<JsonObject> existingScrolls = new ArrayList<>();
+        NBTItem nbtTeleportBook = new NBTItem(teleportBook);
+
+        if (!nbtTeleportBook.hasKey(NBTFields.JSON)) {
+            return existingScrolls;
+        }
+
+        String teleportJson = nbtTeleportBook.getString(NBTFields.JSON);
+
+        JsonArray jsonArray = new JsonParser().parse(teleportJson).getAsJsonArray();
+
+        for (JsonElement teleportElement : jsonArray) {
+            JsonObject teleport = teleportElement.getAsJsonObject();
+            existingScrolls.add(teleport);
+        }
+
+        return existingScrolls;
     }
 
     private String getTeleportBookName() {
@@ -233,7 +307,7 @@ public class TeleportBook extends BaseItem {
         }
     }
 
-    public ItemStack getItem() {
+    private ItemStack getItem() {
         if (hasVanishingCurse) {
             addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
         }

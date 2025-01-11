@@ -44,10 +44,10 @@ public class ActivateTeleportScrollHandler {
         Location location = player.getLocation();
 
         String w = world.getName();
-        int x = this.getX((int) location.getX());
-        int y = ((int) Math.round(location.getY()));
-        int z = this.getZ((int) location.getZ());
-        float yaw = this.getYaw(location);
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+        float yaw = location.getYaw();
 
         ItemStack teleportScroll;
 
@@ -73,28 +73,5 @@ public class ActivateTeleportScrollHandler {
         } else {
             return z;
         }
-    }
-
-    private float getYaw(Location location)
-    {
-        float trueYaw = location.getYaw();
-
-        if (trueYaw >= 135 || trueYaw <= -135) {
-            // facing north
-            return 180;
-        }
-
-        if (trueYaw >= -135 && trueYaw <= - 45) {
-            // facing east
-            return -90;
-        }
-
-        if (trueYaw > -45 && trueYaw <= 45) {
-            // facing south
-            return 0;
-        }
-
-        // facing west
-        return 90;
     }
 }
